@@ -73,14 +73,10 @@ import {
 function createStderrLogger(): ClientOptions['logger'] {
   return {
     error: (msg, ...args) =>
-      // biome-ignore lint/suspicious/noConsole:: intentional console output -- SDK logger must use console
       console.error('[Anthropic SDK ERROR]', msg, ...args),
-    // biome-ignore lint/suspicious/noConsole:: intentional console output -- SDK logger must use console
     warn: (msg, ...args) => console.error('[Anthropic SDK WARN]', msg, ...args),
-    // biome-ignore lint/suspicious/noConsole:: intentional console output -- SDK logger must use console
     info: (msg, ...args) => console.error('[Anthropic SDK INFO]', msg, ...args),
     debug: (msg, ...args) =>
-      // biome-ignore lint/suspicious/noConsole:: intentional console output -- SDK logger must use console
       console.error('[Anthropic SDK DEBUG]', msg, ...args),
   }
 }
@@ -340,7 +336,7 @@ function getCustomHeaders(): Record<string, string> {
     if (!headerString.trim()) continue
 
     // Parse header in format "Name: Value" (curl style). Split on first `:`
-    // then trim — avoids regex backtracking on malformed long header lines.
+    // then trim 鈥?avoids regex backtracking on malformed long header lines.
     const colonIdx = headerString.indexOf(':')
     if (colonIdx === -1) continue
     const name = headerString.slice(0, colonIdx).trim()
@@ -361,7 +357,7 @@ function buildFetch(
 ): ClientOptions['fetch'] {
   // eslint-disable-next-line eslint-plugin-n/no-unsupported-features/node-builtins
   const inner = fetchOverride ?? globalThis.fetch
-  // Only send to the first-party API — Bedrock/Vertex/Foundry don't log it
+  // Only send to the first-party API 鈥?Bedrock/Vertex/Foundry don't log it
   // and unknown headers risk rejection by strict proxies (inc-4029 class).
   const injectClientRequestId =
     getAPIProvider() === 'firstParty' && isFirstPartyAnthropicBaseUrl()

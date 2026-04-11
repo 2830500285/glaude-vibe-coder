@@ -8,7 +8,7 @@
  *   3. Opens a new terminal window running claude with the appropriate args
  *
  * This runs in a headless context (no TTY) because the OS launches the binary
- * directly — there is no terminal attached.
+ * directly 鈥?there is no terminal attached.
  */
 
 import { homedir } from 'os'
@@ -41,20 +41,19 @@ export async function handleDeepLinkUri(uri: string): Promise<number> {
     action = parseDeepLink(uri)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(`Deep link error: ${message}`)
     return 1
   }
 
   logForDebugging(`Parsed deep link action: ${jsonStringify(action)}`)
 
-  // Always the running executable — no PATH lookup. The OS launched us via
+  // Always the running executable 鈥?no PATH lookup. The OS launched us via
   // an absolute path (bundle symlink / .desktop Exec= / registry command)
   // baked at registration time, and we want the terminal-launched Claude to
   // be the same binary. process.execPath is that binary.
   const { cwd, resolvedRepo } = await resolveCwd(action)
   // Resolve FETCH_HEAD age here, in the trampoline process, so main.tsx
-  // stays await-free — the launched instance receives it as a precomputed
+  // stays await-free 鈥?the launched instance receives it as a precomputed
   // flag instead of statting the filesystem on its own startup path.
   const lastFetch = resolvedRepo ? await readLastFetchTime(cwd) : undefined
   const launched = await launchInTerminal(process.execPath, {
@@ -64,7 +63,6 @@ export async function handleDeepLinkUri(uri: string): Promise<number> {
     lastFetchMs: lastFetch?.getTime(),
   })
   if (!launched) {
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(
       'Failed to open a terminal. Make sure a supported terminal emulator is installed.',
     )
@@ -83,10 +81,10 @@ export async function handleDeepLinkUri(uri: string): Promise<number> {
  */
 export async function handleUrlSchemeLaunch(): Promise<number | null> {
   // LaunchServices overwrites __CFBundleIdentifier with the launching bundle's
-  // ID. This is a precise positive signal — it's set to our exact bundle ID
+  // ID. This is a precise positive signal 鈥?it's set to our exact bundle ID
   // if and only if macOS launched us via the URL handler .app bundle.
   // (`open` from a terminal passes the caller's env through, so negative
-  // heuristics like !TERM don't work — the terminal's TERM leaks in.)
+  // heuristics like !TERM don't work 鈥?the terminal's TERM leaks in.)
   if (process.env.__CFBundleIdentifier !== MACOS_BUNDLE_ID) {
     return null
   }
@@ -99,7 +97,7 @@ export async function handleUrlSchemeLaunch(): Promise<number | null> {
     }
     return await handleDeepLinkUri(await url as string)
   } catch {
-    // NAPI module not available, or handleDeepLinkUri rejected — not a URL launch
+    // NAPI module not available, or handleDeepLinkUri rejected 鈥?not a URL launch
     return null
   }
 }
@@ -107,11 +105,11 @@ export async function handleUrlSchemeLaunch(): Promise<number | null> {
 /**
  * Resolve the working directory for the launched Claude instance.
  * Precedence: explicit cwd > repo lookup (MRU clone) > home.
- * A repo that isn't cloned locally is not an error — fall through to home
+ * A repo that isn't cloned locally is not an error 鈥?fall through to home
  * so a web link referencing a repo the user doesn't have still opens Claude.
  *
  * Returns the resolved cwd, and the repo slug if (and only if) the MRU
- * lookup hit — so the launched instance can show which clone was selected
+ * lookup hit 鈥?so the launched instance can show which clone was selected
  * and its git freshness.
  */
 async function resolveCwd(action: {
@@ -125,7 +123,7 @@ async function resolveCwd(action: {
     const known = getKnownPathsForRepo(action.repo)
     const existing = await filterExistingPaths(known)
     if (existing[0]) {
-      logForDebugging(`Resolved repo ${action.repo} → ${existing[0]}`)
+      logForDebugging(`Resolved repo ${action.repo} 鈫?${existing[0]}`)
       return { cwd: existing[0], resolvedRepo: action.repo }
     }
     logForDebugging(

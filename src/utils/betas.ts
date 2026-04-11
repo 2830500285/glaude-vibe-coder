@@ -69,7 +69,6 @@ export function filterAllowedSdkBetas(
   }
 
   if (isClaudeAISubscriber()) {
-    // biome-ignore lint/suspicious/noConsole: intentional warning
     console.warn(
       'Warning: Custom betas are only available for API key users. Ignoring provided betas.',
     )
@@ -78,7 +77,6 @@ export function filterAllowedSdkBetas(
 
   const { allowed, disallowed } = partitionBetasByAllowlist(sdkBetas)
   for (const beta of disallowed) {
-    // biome-ignore lint/suspicious/noConsole: intentional warning
     console.warn(
       `Warning: Beta header '${beta}' is not allowed. Only the following betas are supported: ${ALLOWED_SDK_BETAS.join(', ')}`,
     )
@@ -156,7 +154,7 @@ export function modelSupportsStructuredOutputs(model: string): boolean {
   )
 }
 
-// @[MODEL LAUNCH]: Add the new model if it supports auto mode (specifically PI probes) — ask in #proj-claude-code-safety-research.
+// @[MODEL LAUNCH]: Add the new model if it supports auto mode (specifically PI probes) 鈥?ask in #proj-claude-code-safety-research.
 export function modelSupportsAutoMode(model: string): boolean {
   if (feature('TRANSCRIPT_CLASSIFIER')) {
     const m = getCanonicalName(model)
@@ -221,7 +219,7 @@ export function shouldIncludeFirstPartyOnlyBetas(): boolean {
 
 /**
  * Global-scope prompt caching is firstParty only. Foundry is excluded because
- * GrowthBook never bucketed Foundry users into the rollout experiment — the
+ * GrowthBook never bucketed Foundry users into the rollout experiment 鈥?the
  * treatment data is firstParty-only.
  */
 export function shouldUseGlobalCacheScope(): boolean {
@@ -261,7 +259,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
     betaHeaders.push(INTERLEAVED_THINKING_BETA_HEADER)
   }
 
-  // Skip the API-side Haiku thinking summarizer — the summary is only used
+  // Skip the API-side Haiku thinking summarizer 鈥?the summary is only used
   // for ctrl+o display, which interactive users rarely open. The API returns
   // redacted_thinking blocks instead; AssistantRedactedThinkingMessage already
   // renders those as a stub. SDK / print-mode keep summaries because callers
@@ -279,7 +277,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   // POC: server-side connector-text summarization (anti-distillation). The
   // API buffers assistant text between tool calls, summarizes it, and returns
   // the summary with a signature so the original can be restored on subsequent
-  // turns — same mechanism as thinking blocks. Ant-only while we measure
+  // turns 鈥?same mechanism as thinking blocks. Ant-only while we measure
   // TTFT/TTLT/capacity; betas already flow to tengu_api_success for splitting.
   // Backend independently requires Capability.ANTHROPIC_INTERNAL_RESEARCH.
   //
@@ -319,7 +317,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   const strictToolsEnabled =
     checkStatsigFeatureGate_CACHED_MAY_BE_STALE('tengu_tool_pear')
   // 3P default: false. API rejects strict + token-efficient-tools together
-  // (tool_use.py:139), so these are mutually exclusive — strict wins.
+  // (tool_use.py:139), so these are mutually exclusive 鈥?strict wins.
   const tokenEfficientToolsEnabled =
     !strictToolsEnabled &&
     getFeatureValue_CACHED_MAY_BE_STALE('tengu_amber_json_tools', false)
@@ -330,7 +328,7 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   ) {
     betaHeaders.push(STRUCTURED_OUTPUTS_BETA_HEADER)
   }
-  // JSON tool_use format (FC v3) — ~4.5% output token reduction vs ANTML.
+  // JSON tool_use format (FC v3) 鈥?~4.5% output token reduction vs ANTML.
   // Sends the v2 header (2026-03-28) added in anthropics/anthropic#337072 to
   // isolate the CC A/B cohort from ~9.2M/week existing v1 senders. Ant-only
   // while the restored JsonToolUseOutputParser soaks.

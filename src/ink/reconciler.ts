@@ -37,7 +37,6 @@ if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
     if (error instanceof Error && (error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND') {
-      // biome-ignore lint/suspicious/noConsole: intentional warning
       console.warn(
         `
 The environment variable DEV is set to true, so Ink tried to import \`react-devtools-core\`,
@@ -144,7 +143,7 @@ function applyProp(node: DOMElement, key: string, value: unknown): void {
 
 // --
 
-// react-reconciler's Fiber shape — only the fields we walk. The 5th arg to
+// react-reconciler's Fiber shape 鈥?only the fields we walk. The 5th arg to
 // createInstance is the Fiber (`workInProgress` in react-reconciler.dev.js).
 // _debugOwner is the component that rendered this element (dev builds only);
 // return is the parent fiber (always present). We prefer _debugOwner since it
@@ -168,7 +167,7 @@ export function getOwnerChain(fiber: unknown): string[] {
         ? (t as { displayName?: string; name?: string }).displayName ||
           (t as { displayName?: string; name?: string }).name
         : typeof t === 'string'
-          ? undefined // host element (ink-box etc) — skip
+          ? undefined // host element (ink-box etc) 鈥?skip
           : t?.displayName || t?.name
     if (name && name !== chain[chain.length - 1]) chain.push(name)
     cur = cur._debugOwner ?? cur.return

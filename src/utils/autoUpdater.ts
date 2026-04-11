@@ -81,7 +81,6 @@ export async function assertMinVersion(): Promise<void> {
       versionConfig.minVersion &&
       lt(MACRO.VERSION, versionConfig.minVersion)
     ) {
-      // biome-ignore lint/suspicious/noConsole:: intentional console output
       console.error(`
 It looks like your version of Claude Code (${MACRO.VERSION}) needs an update.
 A newer version (${versionConfig.minVersion} or higher) is required to continue.
@@ -228,7 +227,7 @@ async function acquireLock(): Promise<boolean> {
       try {
         // fs.mkdir from getFsImplementation() is always recursive:true and
         // swallows EEXIST internally, so a dir-creation race cannot reach the
-        // catch below — only writeFile's EEXIST (true lock contention) can.
+        // catch below 鈥?only writeFile's EEXIST (true lock contention) can.
         await fs.mkdir(getClaudeConfigHomeDir())
         await writeFile(lockPath, `${process.pid}`, {
           encoding: 'utf8',
@@ -478,7 +477,6 @@ export async function installGlobalPackage(
         currentVersion:
           MACRO.VERSION as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
-      // biome-ignore lint/suspicious/noConsole:: intentional console output
       console.error(`
 Error: Windows NPM detected in WSL
 

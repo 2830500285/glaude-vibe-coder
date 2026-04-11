@@ -63,7 +63,7 @@ export type BackoffConfig = {
   generalInitialMs: number
   generalCapMs: number
   generalGiveUpMs: number
-  /** SIGTERM→SIGKILL grace period on shutdown. Default 30s. */
+  /** SIGTERM鈫扴IGKILL grace period on shutdown. Default 30s. */
   shutdownGraceMs?: number
   /** stopWorkWithRetry base delay (1s/2s/4s backoff). Default 1000ms. */
   stopWorkBaseDelayMs?: number
@@ -84,8 +84,7 @@ const SPAWN_SESSIONS_DEFAULT = 32
 
 /**
  * GrowthBook gate for multi-session spawn modes (--spawn / --capacity / --create-session-in-dir).
- * Sibling of tengu_ccr_bridge_multi_environment (multiple envs per host:dir) —
- * this one enables multiple sessions per environment.
+ * Sibling of tengu_ccr_bridge_multi_environment (multiple envs per host:dir) 鈥? * this one enables multiple sessions per environment.
  * Rollout staged via targeting rules: ants first, then gradual external.
  *
  * Uses the blocking gate check so a stale disk-cache miss doesn't unfairly
@@ -99,9 +98,9 @@ async function isMultiSessionSpawnEnabled(): Promise<boolean> {
 
 /**
  * Returns the threshold for detecting system sleep/wake in the poll loop.
- * Must exceed the max backoff cap — otherwise normal backoff delays trigger
+ * Must exceed the max backoff cap 鈥?otherwise normal backoff delays trigger
  * false sleep detection (resetting the error budget indefinitely). Using
- * 2× the connection backoff cap, matching the pattern in WebSocketTransport
+ * 2脳 the connection backoff cap, matching the pattern in WebSocketTransport
  * and replBridge.
  */
 function pollSleepDetectionThresholdMs(backoff: BackoffConfig): number {
@@ -112,7 +111,7 @@ function pollSleepDetectionThresholdMs(backoff: BackoffConfig): number {
  * Returns the args that must precede CLI flags when spawning a child claude
  * process. In compiled binaries, process.execPath is the claude binary itself
  * and args go directly to it. In npm installs (node running cli.js),
- * process.execPath is the node runtime — the child spawn must pass the script
+ * process.execPath is the node runtime 鈥?the child spawn must pass the script
  * path as the first arg, otherwise node interprets --sdk-url as a node option
  * and exits with "bad option: --sdk-url". See anthropics/claude-code#28334.
  */
@@ -196,7 +195,7 @@ export async function runBridgeLoop(
   /**
    * Heartbeat all active work items.
    * Returns 'ok' if at least one heartbeat succeeded, 'auth_failed' if any
-   * got a 401/403 (JWT expired — re-queued via reconnectSession so the next
+   * got a 401/403 (JWT expired 鈥?re-queued via reconnectSession so the next
    * poll delivers fresh work), or 'failed' if all failed for other reasons.
    */
   async function heartbeatActiveWorkItems(): Promise<
@@ -229,13 +228,13 @@ export async function runBridgeLoop(
           if (err.status === 401 || err.status === 403) {
             authFailedSessions.push(sessionId)
           } else {
-            // 404/410 = environment expired or deleted — no point retrying
+            // 404/410 = environment expired or deleted 鈥?no point retrying
             anyFatal = true
           }
         }
       }
     }
-    // JWT expired → trigger server-side re-dispatch. Without this, work stays
+    // JWT expired 鈫?trigger server-side re-dispatch. Without this, work stays
     // ACK'd out of the Redis PEL and poll returns empty forever (CC-1263).
     // The existingHandle path below delivers the fresh token to the child.
     // sessionId is already in the format /bridge/reconnect expects: it comes
@@ -243,7 +242,7 @@ export async function runBridgeLoop(
     // (cse_* under the compat gate, session_* otherwise).
     for (const sessionId of authFailedSessions) {
       logger.logVerbose(
-        `Session ${sessionId} token expired — re-queuing via bridge/reconnect`,
+        `Session ${sessionId} token expired 鈥?re-queuing via bridge/reconnect`,
       )
       try {
         await api.reconnectSession(environmentId, sessionId)
@@ -272,7 +271,7 @@ export async function runBridgeLoop(
   // Sessions spawned with CCR v2 env vars. v2 children cannot use OAuth
   // tokens (CCR worker endpoints validate the JWT's session_id claim,
   // register_worker.go:32), so onRefresh triggers server re-dispatch
-  // instead — the next poll delivers fresh work with a new JWT via the
+  // instead 鈥?the next poll delivers fresh work with a new JWT via the
   // existingHandle path below.
   const v2Sessions = new Set<string>()
 
@@ -393,7 +392,7 @@ export async function runBridgeLoop(
 
     // Show the most recently started session that is still actively working.
     // Sessions whose current activity is 'result' or 'error' are between
-    // turns — the CLI emitted its result but the process stays alive waiting
+    // turns 鈥?the CLI emitted its result but the process stays alive waiting
     // for the next user message.  Skip updating so the status line keeps
     // whatever state it had (Attached / session title).
     const [sessionId, handle] = [...activeSessions.entries()].pop()!
@@ -402,7 +401,7 @@ export async function runBridgeLoop(
 
     const activity = handle.currentActivity
     if (!activity || activity.type === 'result' || activity.type === 'error') {
-      // Session is between turns — keep current status (Attached/titled).
+      // Session is between turns 鈥?keep current status (Attached/titled).
       // In multi-session mode, still refresh so bullet-list activities stay current.
       if (config.maxSessions > 1) logger.refreshDisplay()
       return
@@ -422,7 +421,7 @@ export async function runBridgeLoop(
   /** Start the status display update ticker. */
   function startStatusUpdates(): void {
     stopStatusUpdates()
-    // Call immediately so the first transition (e.g. Connecting → Ready)
+    // Call immediately so the first transition (e.g. Connecting 鈫?Ready)
     // happens without delay, avoiding concurrent timer races.
     updateStatusDisplay()
     statusUpdateTimer = setInterval(
@@ -501,9 +500,9 @@ export async function runBridgeLoop(
           logger.logSessionComplete(sessionId, durationMs)
           break
         case 'failed':
-          // Skip failure log during shutdown — the child exits non-zero when
+          // Skip failure log during shutdown 鈥?the child exits non-zero when
           // killed, which is expected and not a real failure.
-          // Also skip for timeout-killed sessions — the timeout watchdog
+          // Also skip for timeout-killed sessions 鈥?the timeout watchdog
           // already logged a clear timeout message.
           if (!wasTimedOut && !loopSignal.aborted) {
             failureMessage = stderrSummary ?? 'Process exited with error'
@@ -517,7 +516,7 @@ export async function runBridgeLoop(
       }
 
       // Notify the server that this work item is done. Skip for interrupted
-      // sessions — interrupts are either server-initiated (the server already
+      // sessions 鈥?interrupts are either server-initiated (the server already
       // knows) or caused by bridge shutdown (which calls stopWork() separately).
       if (status !== 'interrupted' && workId) {
         trackCleanup(
@@ -560,7 +559,7 @@ export async function runBridgeLoop(
           // archived), so double-archiving at shutdown is safe.
           // sessionId arrived as cse_* from the work poll (infrastructure-layer
           // tag). archiveSession hits /v1/sessions/{id}/archive which is the
-          // compat surface and validates TagSession (session_*). Re-tag — same
+          // compat surface and validates TagSession (session_*). Re-tag 鈥?same
           // UUID underneath.
           trackCleanup(
             api
@@ -575,7 +574,7 @@ export async function runBridgeLoop(
             `[bridge:session] Session ${status}, returning to idle (multi-session mode)`,
           )
         } else {
-          // Single-session: coupled lifecycle — tear down environment
+          // Single-session: coupled lifecycle 鈥?tear down environment
           logForDebugging(
             `[bridge:session] Session ${status}, aborting poll loop to tear down environment`,
           )
@@ -590,7 +589,7 @@ export async function runBridgeLoop(
     }
   }
 
-  // Start the idle status display immediately — unless we have a pre-created
+  // Start the idle status display immediately 鈥?unless we have a pre-created
   // session, in which case setAttached() already set up the display and the
   // poll loop will start status updates when it picks up the session.
   if (!initialSessionId) {
@@ -598,7 +597,7 @@ export async function runBridgeLoop(
   }
 
   while (!loopSignal.aborted) {
-    // Fetched once per iteration — the GrowthBook cache refreshes every
+    // Fetched once per iteration 鈥?the GrowthBook cache refreshes every
     // 5 min, so a loop running at the at-capacity rate picks up config
     // changes within one sleep cycle.
     const pollConfig = getPollIntervalConfig()
@@ -641,11 +640,11 @@ export async function runBridgeLoop(
           const atCapMs = pollConfig.multisession_poll_interval_ms_at_capacity
           // Heartbeat loops WITHOUT polling. When at-capacity polling is also
           // enabled (atCapMs > 0), the loop tracks a deadline and breaks out
-          // to poll at that interval — heartbeat and poll compose instead of
+          // to poll at that interval 鈥?heartbeat and poll compose instead of
           // one suppressing the other. We break out to poll when:
           //   - Poll deadline reached (atCapMs > 0 only)
-          //   - Auth fails (JWT expired → poll refreshes tokens)
-          //   - Capacity wake fires (session ended → poll for new work)
+          //   - Auth fails (JWT expired 鈫?poll refreshes tokens)
+          //   - Capacity wake fires (session ended 鈫?poll for new work)
           //   - Loop aborted (shutdown)
           if (pollConfig.non_exclusive_heartbeat_interval_ms > 0) {
             logEvent('tengu_bridge_heartbeat_mode_entered', {
@@ -653,7 +652,7 @@ export async function runBridgeLoop(
               heartbeat_interval_ms:
                 pollConfig.non_exclusive_heartbeat_interval_ms,
             })
-            // Deadline computed once at entry — GB updates to atCapMs don't
+            // Deadline computed once at entry 鈥?GB updates to atCapMs don't
             // shift an in-flight deadline (next entry picks up the new value).
             const pollDeadline = atCapMs > 0 ? Date.now() + atCapMs : null
             let hbResult: 'ok' | 'auth_failed' | 'fatal' | 'failed' = 'ok'
@@ -708,13 +707,13 @@ export async function runBridgeLoop(
               // so the once-per-10min poll_due poll is invisible at counter=2.
               // Log it here so verification runs see both endpoints in the debug log.
               logForDebugging(
-                `[bridge:poll] Heartbeat poll_due after ${hbCycles} cycles — falling through to pollForWork`,
+                `[bridge:poll] Heartbeat poll_due after ${hbCycles} cycles 鈥?falling through to pollForWork`,
               )
             }
 
             // On auth_failed or fatal, sleep before polling to avoid a tight
             // poll+heartbeat loop. Auth_failed: heartbeatActiveWorkItems
-            // already called reconnectSession — the sleep gives the server
+            // already called reconnectSession 鈥?the sleep gives the server
             // time to propagate the re-queue. Fatal (404/410): may be a
             // single work item GCd while the environment is still valid.
             // Use atCapMs if enabled, else the heartbeat interval as a floor
@@ -745,7 +744,7 @@ export async function runBridgeLoop(
         continue
       }
 
-      // At capacity — we polled to keep the heartbeat alive, but cannot
+      // At capacity 鈥?we polled to keep the heartbeat alive, but cannot
       // accept new work right now. We still enter the switch below so that
       // token refreshes for existing sessions are processed (the case
       // 'session' handler checks for existing sessions before the inner
@@ -759,7 +758,7 @@ export async function runBridgeLoop(
         logForDebugging(
           `[bridge:work] Skipping already-completed workId=${work.id}`,
         )
-        // Respect capacity throttle — without a sleep here, persistent stale
+        // Respect capacity throttle 鈥?without a sleep here, persistent stale
         // redeliveries would tight-loop at poll-request speed (the !work
         // branch above is the only sleep, and work != null skips it).
         if (atCapacityBeforeSwitch) {
@@ -795,7 +794,7 @@ export async function runBridgeLoop(
         )
         logEvent('tengu_bridge_work_secret_failed', {})
         // Can't ack (needs the JWT we failed to decode). stopWork uses OAuth,
-        // so it's callable here — prevents XAUTOCLAIM from re-delivering this
+        // so it's callable here 鈥?prevents XAUTOCLAIM from re-delivering this
         // poisoned item every reclaim_older_than_ms cycle.
         completedWorkIds.add(work.id)
         trackCleanup(
@@ -807,7 +806,7 @@ export async function runBridgeLoop(
             backoffConfig.stopWorkBaseDelayMs,
           ),
         )
-        // Respect capacity throttle before retrying — without a sleep here,
+        // Respect capacity throttle before retrying 鈥?without a sleep here,
         // repeated decode failures at capacity would tight-loop at
         // poll-request speed (work != null skips the !work sleep above).
         if (atCapacityBeforeSwitch) {
@@ -829,7 +828,7 @@ export async function runBridgeLoop(
         continue
       }
 
-      // Explicitly acknowledge after committing to handle the work — NOT
+      // Explicitly acknowledge after committing to handle the work 鈥?NOT
       // before. The at-capacity guard inside case 'session' can break
       // without spawning; acking there would permanently lose the work.
       // Ack failures are non-fatal: server re-delivers, and existingHandle
@@ -885,7 +884,7 @@ export async function runBridgeLoop(
             break
           }
 
-          // At capacity — token refresh for existing sessions is handled
+          // At capacity 鈥?token refresh for existing sessions is handled
           // above, but we cannot spawn new ones. The post-switch capacity
           // sleep will throttle the loop; just break here.
           if (activeSessions.size >= config.maxSessions) {
@@ -900,7 +899,7 @@ export async function runBridgeLoop(
 
           // CCR v2 path: register this bridge as the session worker, get the
           // epoch, and point the child at /v1/code/sessions/{id}. The child
-          // already has the full v2 client (SSETransport + CCRClient) — same
+          // already has the full v2 client (SSETransport + CCRClient) 鈥?same
           // code path environment-manager launches in containers.
           //
           // v1 path: Session-Ingress WebSocket. Uses config.sessionIngressUrl
@@ -964,9 +963,9 @@ export async function runBridgeLoop(
           // so concurrent sessions don't interfere with each other's file
           // changes. The pre-created initial session (if any) runs in
           // config.dir so the user's first session lands in the directory they
-          // invoked `rc` from — matching the old single-session UX.
+          // invoked `rc` from 鈥?matching the old single-session UX.
           // In same-dir and single-session modes, all sessions share config.dir.
-          // Capture spawnMode before the await below — the `w` key handler
+          // Capture spawnMode before the await below 鈥?the `w` key handler
           // mutates config.spawnMode directly, and createAgentWorktree can
           // take 1-2s, so reading config.spawnMode after the await can
           // produce contradictory analytics (spawn_mode:'same-dir', in_worktree:true).
@@ -1034,8 +1033,7 @@ export async function runBridgeLoop(
               onFirstUserMessage: text => {
                 // Server-set titles (--name, web rename) win. fetchSessionTitle
                 // runs concurrently; if it already populated titledSessions,
-                // skip. If it hasn't resolved yet, the derived title sticks —
-                // acceptable since the server had no title at spawn time.
+                // skip. If it hasn't resolved yet, the derived title sticks 鈥?                // acceptable since the server had no title at spawn time.
                 if (titledSessions.has(compatSessionId)) return
                 titledSessions.add(compatSessionId)
                 const title = deriveSessionTitle(text)
@@ -1238,7 +1236,7 @@ export async function runBridgeLoop(
         break
       }
 
-      // Fatal errors (401/403) — no point retrying, auth won't fix itself
+      // Fatal errors (401/403) 鈥?no point retrying, auth won't fix itself
       if (err instanceof BridgeFatalError) {
         fatalExit = true
         // Server-enforced expiry gets a clean status message, not an error
@@ -1246,7 +1244,7 @@ export async function runBridgeLoop(
           logger.logStatus(err.message)
         } else if (isSuppressible403(err)) {
           // Cosmetic 403 errors (e.g., external_poll_sessions scope,
-          // environments:manage permission) — don't show to user
+          // environments:manage permission) 鈥?don't show to user
           logForDebugging(`[bridge:work] Suppressed 403 error: ${err.message}`)
         } else {
           logger.logError(err.message)
@@ -1419,7 +1417,7 @@ export async function runBridgeLoop(
   // the bridge as offline.
 
   // Collect all session IDs to archive on exit. This includes:
-  // 1. Active sessions (snapshot before killing — onSessionDone clears maps)
+  // 1. Active sessions (snapshot before killing 鈥?onSessionDone clears maps)
   // 2. The initial auto-created session (may never have had work dispatched)
   // api.archiveSession is idempotent (409 if already archived), so
   // double-archiving is safe.
@@ -1427,7 +1425,7 @@ export async function runBridgeLoop(
   if (initialSessionId) {
     sessionsToArchive.add(initialSessionId)
   }
-  // Snapshot before killing — onSessionDone clears sessionCompatIds.
+  // Snapshot before killing 鈥?onSessionDone clears sessionCompatIds.
   const compatIdSnapshot = new Map(sessionCompatIds)
 
   if (activeSessions.size > 0) {
@@ -1438,7 +1436,7 @@ export async function runBridgeLoop(
       `Shutting down ${activeSessions.size} active session(s)\u2026`,
     )
 
-    // Snapshot work IDs before killing — onSessionDone clears the maps when
+    // Snapshot work IDs before killing 鈥?onSessionDone clears the maps when
     // each child exits, so we need a copy for the stopWork calls below.
     const shutdownWorkIds = new Map(sessionWorkIds)
 
@@ -1506,7 +1504,7 @@ export async function runBridgeLoop(
   }
 
   // Ensure all in-flight cleanup (stopWork, worktree removal) from
-  // onSessionDone completes before deregistering — otherwise
+  // onSessionDone completes before deregistering 鈥?otherwise
   // process.exit() can kill them mid-flight.
   if (pendingCleanups.size > 0) {
     await Promise.allSettled([...pendingCleanups])
@@ -1516,9 +1514,8 @@ export async function runBridgeLoop(
   // environment alive so `claude remote-control --session-id=<id>` can resume.
   // The backend GCs stale environments via a 4h TTL (BRIDGE_LAST_POLL_TTL).
   // Archiving the session or deregistering the environment would make the
-  // printed resume command a lie — deregister deletes Firestore + Redis stream.
-  // Skip when the loop exited fatally (env expired, auth failed, give-up) —
-  // resume is impossible in those cases and the message would contradict the
+  // printed resume command a lie 鈥?deregister deletes Firestore + Redis stream.
+  // Skip when the loop exited fatally (env expired, auth failed, give-up) 鈥?  // resume is impossible in those cases and the message would contradict the
   // error already printed.
   // feature('KAIROS') gate: --session-id is ant-only; without the gate,
   // revert to the pre-PR behavior (archive + deregister on every shutdown).
@@ -1570,7 +1567,7 @@ export async function runBridgeLoop(
     logger.logVerbose(`Failed to deregister environment: ${errorMessage(err)}`)
   }
 
-  // Clear the crash-recovery pointer — the env is gone, pointer would be
+  // Clear the crash-recovery pointer 鈥?the env is gone, pointer would be
   // stale. The early return above (resumable SIGINT shutdown) skips this,
   // leaving the pointer as a backup for the printed --session-id hint.
   const { clearBridgePointer } = await import('./bridgePointer.js')
@@ -1611,7 +1608,7 @@ export function isServerError(err: unknown): boolean {
   )
 }
 
-/** Add ±25% jitter to a delay value. */
+/** Add 卤25% jitter to a delay value. */
 function addJitter(ms: number): number {
   return Math.max(0, ms + ms * 0.25 * (2 * Math.random() - 1))
 }
@@ -1887,7 +1884,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 }
 
 async function printHelp(): Promise<void> {
-  // Use EXTERNAL_PERMISSION_MODES for help text — internal modes (bubble)
+  // Use EXTERNAL_PERMISSION_MODES for help text 鈥?internal modes (bubble)
   // are ant-only and auto is feature-gated; they're still accepted by validation.
   const { EXTERNAL_PERMISSION_MODES } = await import('../types/permissions.js')
   const modes = EXTERNAL_PERMISSION_MODES.join(', ')
@@ -1946,7 +1943,6 @@ NOTES
   - You must be logged in with a Claude account that has a subscription
   - Run \`claude\` first in the directory to accept the workspace trust dialog
 ${serverNote}`
-  // biome-ignore lint/suspicious/noConsole: intentional help output
   console.log(help)
 }
 
@@ -1954,7 +1950,7 @@ const TITLE_MAX_LEN = 80
 
 /** Derive a session title from a user message: first line, truncated. */
 function deriveSessionTitle(text: string): string {
-  // Collapse whitespace — newlines/tabs would break the single-line status display.
+  // Collapse whitespace 鈥?newlines/tabs would break the single-line status display.
   const flat = text.replace(/\s+/g, ' ').trim()
   return truncateToWidth(flat, TITLE_MAX_LEN)
 }
@@ -1965,7 +1961,7 @@ function deriveSessionTitle(text: string): string {
  * Uses `getBridgeSession` from createSession.ts (ccr-byoc headers + org UUID)
  * rather than the environments-level bridgeApi client, whose headers make the
  * Sessions API return 404. Returns undefined if the session has no title yet
- * or the fetch fails — the caller falls back to deriving a title from the
+ * or the fetch fails 鈥?the caller falls back to deriving a title from the
  * first user message.
  */
 async function fetchSessionTitle(
@@ -1985,7 +1981,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     return
   }
   if (parsed.error) {
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(`Error: ${parsed.error}`)
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(1)
@@ -2024,7 +2019,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     const { PERMISSION_MODES } = await import('../types/permissions.js')
     const valid: readonly string[] = PERMISSION_MODES
     if (!valid.includes(permissionMode)) {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Invalid permission mode '${permissionMode}'. Valid modes: ${valid.join(', ')}`,
       )
@@ -2059,7 +2053,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
       used_capacity: parsedCapacity !== undefined,
       used_create_session_in_dir: parsedCreateSessionInDir !== undefined,
     })
-    // logEventAsync only enqueues — process.exit() discards buffered events.
+    // logEventAsync only enqueues 鈥?process.exit() discards buffered events.
     // Flush explicitly, capped at 500ms to match gracefulShutdown.ts.
     // (sleep() doesn't unref its timer, but process.exit() follows immediately
     // so the ref'd timer can't delay shutdown.)
@@ -2067,7 +2061,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       Promise.all([shutdown1PEventLogging(), shutdownDatadog()]),
       sleep(500, undefined, { unref: true }),
     ]).catch(() => {})
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(
       'Error: Multi-session Remote Control is not enabled for your account yet.',
     )
@@ -2084,7 +2077,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // The bridge bypasses main.tsx (which renders the interactive TrustDialog via showSetupScreens),
   // so we must verify trust was previously established by a normal `claude` session.
   if (!checkHasTrustDialogAccepted()) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       `Error: Workspace not trusted. Please run \`claude\` in ${dir} first to review and accept the workspace trust dialog.`,
     )
@@ -2101,13 +2093,12 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   const bridgeToken = getBridgeAccessToken()
   if (!bridgeToken) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(BRIDGE_LOGIN_ERROR)
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(1)
   }
 
-  // First-time remote dialog — explain what bridge does and get consent
+  // First-time remote dialog 鈥?explain what bridge does and get consent
   const {
     getGlobalConfig,
     saveGlobalConfig,
@@ -2120,7 +2111,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       input: process.stdin,
       output: process.stdout,
     })
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(
       '\nRemote Control lets you access this CLI session from the web (claude.ai/code)\nor the Claude app, so you can pick up where you left off on any device.\n\nYou can disconnect remote access anytime by running /remote-control again.\n',
     )
@@ -2141,10 +2131,10 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // --continue: resolve the most recent session from the crash-recovery
   // pointer and chain into the #20460 --session-id flow. Worktree-aware:
   // checks current dir first (fast path, zero exec), then fans out to git
-  // worktree siblings if that misses — the REPL bridge writes to
+  // worktree siblings if that misses 鈥?the REPL bridge writes to
   // getOriginalCwd() which EnterWorktreeTool/activeWorktreeSession can
   // point at a worktree while the user's shell is at the repo root.
-  // KAIROS-gated at parseArgs — continueSession is always false in external
+  // KAIROS-gated at parseArgs 鈥?continueSession is always false in external
   // builds, so this block tree-shakes.
   if (feature('KAIROS') && continueSession) {
     const { readBridgePointerAcrossWorktrees } = await import(
@@ -2152,7 +2142,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     )
     const found = await readBridgePointerAcrossWorktrees(dir)
     if (!found) {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: No recent session found in this directory or its worktrees. Run \`claude remote-control\` to start a new one.`,
       )
@@ -2163,13 +2152,12 @@ export async function bridgeMain(args: string[]): Promise<void> {
     const ageMin = Math.round(pointer.ageMs / 60_000)
     const ageStr = ageMin < 60 ? `${ageMin}m` : `${Math.round(ageMin / 60)}h`
     const fromWt = pointerDir !== dir ? ` from worktree ${pointerDir}` : ''
-    // biome-ignore lint/suspicious/noConsole: intentional info output
     console.error(
       `Resuming session ${pointer.sessionId} (${ageStr} ago)${fromWt}\u2026`,
     )
     resumeSessionId = pointer.sessionId
     // Track where the pointer came from so the #20460 exit(1) paths below
-    // clear the RIGHT file on deterministic failure — otherwise --continue
+    // clear the RIGHT file on deterministic failure 鈥?otherwise --continue
     // would keep hitting the same dead session. May be a worktree sibling.
     resumePointerDir = pointerDir
   }
@@ -2184,7 +2172,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
     !baseUrl.includes('localhost') &&
     !baseUrl.includes('127.0.0.1')
   ) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       'Error: Remote Control base URL uses HTTP. Only HTTPS or localhost HTTP is allowed.',
     )
@@ -2213,17 +2200,15 @@ export async function bridgeMain(args: string[]): Promise<void> {
   const worktreeAvailable = hasWorktreeCreateHook() || findGitRoot(dir) !== null
 
   // Load saved per-project spawn-mode preference. Gated by multiSessionEnabled
-  // so a GrowthBook rollback cleanly reverts users to single-session —
-  // otherwise a saved pref would silently re-enable multi-session behavior
+  // so a GrowthBook rollback cleanly reverts users to single-session 鈥?  // otherwise a saved pref would silently re-enable multi-session behavior
   // (worktree isolation, 32 max sessions, w toggle) despite the gate being off.
   // Also guard against a stale worktree pref left over from when this dir WAS
-  // a git repo (or the user copied config) — clear it on disk so the warning
+  // a git repo (or the user copied config) 鈥?clear it on disk so the warning
   // doesn't repeat on every launch.
   let savedSpawnMode = multiSessionEnabled
     ? getCurrentProjectConfig().remoteControlSpawnMode
     : undefined
   if (savedSpawnMode === 'worktree' && !worktreeAvailable) {
-    // biome-ignore lint/suspicious/noConsole: intentional warning output
     console.error(
       'Warning: Saved spawn mode is worktree but this directory is not a git repository. Falling back to same-dir.',
     )
@@ -2250,7 +2235,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
       input: process.stdin,
       output: process.stdout,
     })
-    // biome-ignore lint/suspicious/noConsole: intentional dialog output
     console.log(
       `\nClaude Remote Control is launching in spawn mode which lets you create new sessions in this project from Claude Code on Web or your Mobile app. Learn more here: https://code.claude.com/docs/en/remote-control\n\n` +
         `Spawn mode for this project:\n` +
@@ -2316,7 +2300,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Without --continue: a leftover pointer means the previous run didn't
   // shut down cleanly (crash, kill -9, terminal closed). Clear it so the
   // stale env doesn't linger past its relevance. Runs in all modes
-  // (clearBridgePointer is a no-op when no file exists) — covers the
+  // (clearBridgePointer is a no-op when no file exists) 鈥?covers the
   // gate-transition case where a user crashed in single-session mode then
   // starts fresh in worktree mode. Only single-session mode writes new
   // pointers.
@@ -2329,7 +2313,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Only reachable via explicit --spawn=worktree (default is same-dir);
   // saved worktree pref was already guarded above.
   if (spawnMode === 'worktree' && !worktreeAvailable) {
-    // biome-ignore lint/suspicious/noConsole: intentional error output
     console.error(
       `Error: Worktree mode requires a git repository or WorktreeCreate hooks configured. Use --spawn=session for single-session mode.`,
     )
@@ -2354,24 +2337,23 @@ export async function bridgeMain(args: string[]): Promise<void> {
 
   // When resuming a session via --session-id, fetch it to learn its
   // environment_id and reuse that for registration (idempotent on the
-  // backend). Left undefined otherwise — the backend rejects
+  // backend). Left undefined otherwise 鈥?the backend rejects
   // client-generated UUIDs and will allocate a fresh environment.
   // feature('KAIROS') gate: --session-id is ant-only; parseArgs already
   // rejects the flag when the gate is off, so resumeSessionId is always
-  // undefined here in external builds — this guard is for tree-shaking.
+  // undefined here in external builds 鈥?this guard is for tree-shaking.
   let reuseEnvironmentId: string | undefined
   if (feature('KAIROS') && resumeSessionId) {
     try {
       validateBridgeId(resumeSessionId, 'sessionId')
     } catch {
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Invalid session ID "${resumeSessionId}". Session IDs must not contain unsafe characters.`,
       )
       // eslint-disable-next-line custom-rules/no-process-exit
       process.exit(1)
     }
-    // Proactively refresh the OAuth token — getBridgeSession uses raw axios
+    // Proactively refresh the OAuth token 鈥?getBridgeSession uses raw axios
     // without the withOAuthRetry 401-refresh logic. An expired-but-present
     // token would otherwise produce a misleading "not found" error.
     await checkAndRefreshOAuthTokenIfNeeded()
@@ -2382,15 +2364,14 @@ export async function bridgeMain(args: string[]): Promise<void> {
       getAccessToken: getBridgeAccessToken,
     })
     if (!session) {
-      // Session gone on server → pointer is stale. Clear it so the user
+      // Session gone on server 鈫?pointer is stale. Clear it so the user
       // isn't re-prompted next launch. (Explicit --session-id leaves the
-      // pointer alone — it's an independent file they may not even have.)
-      // resumePointerDir may be a worktree sibling — clear THAT file.
+      // pointer alone 鈥?it's an independent file they may not even have.)
+      // resumePointerDir may be a worktree sibling 鈥?clear THAT file.
       if (resumePointerDir) {
         const { clearBridgePointer } = await import('./bridgePointer.js')
         await clearBridgePointer(resumePointerDir)
       }
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Session ${resumeSessionId} not found. It may have been archived or expired, or your login may have lapsed (run \`claude /login\`).`,
       )
@@ -2402,7 +2383,6 @@ export async function bridgeMain(args: string[]): Promise<void> {
         const { clearBridgePointer } = await import('./bridgePointer.js')
         await clearBridgePointer(resumePointerDir)
       }
-      // biome-ignore lint/suspicious/noConsole: intentional error output
       console.error(
         `Error: Session ${resumeSessionId} has no environment_id. It may never have been attached to a bridge.`,
       )
@@ -2455,8 +2435,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
     logEvent('tengu_bridge_registration_failed', {
       status: err instanceof BridgeFatalError ? err.status : undefined,
     })
-    // Registration failures are fatal — print a clean message instead of a stack trace.
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
+    // Registration failures are fatal 鈥?print a clean message instead of a stack trace.
     console.error(
       err instanceof BridgeFatalError && err.status === 404
         ? 'Remote Control environments are not available for your account.'
@@ -2472,7 +2451,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   let effectiveResumeSessionId: string | undefined
   if (feature('KAIROS') && resumeSessionId) {
     if (reuseEnvironmentId && environmentId !== reuseEnvironmentId) {
-      // Backend returned a different environment_id — the original env
+      // Backend returned a different environment_id 鈥?the original env
       // expired or was reaped. Reconnect won't work against the new env
       // (session is bound to the old one). Log to sentry for visibility
       // and fall through to fresh session creation on the new env.
@@ -2481,12 +2460,11 @@ export async function bridgeMain(args: string[]): Promise<void> {
           `Bridge resume env mismatch: requested ${reuseEnvironmentId}, backend returned ${environmentId}. Falling back to fresh session.`,
         ),
       )
-      // biome-ignore lint/suspicious/noConsole: intentional warning output
       console.warn(
-        `Warning: Could not resume session ${resumeSessionId} — its environment has expired. Creating a fresh session instead.`,
+        `Warning: Could not resume session ${resumeSessionId} 鈥?its environment has expired. Creating a fresh session instead.`,
       )
-      // Don't deregister — we're going to use this new environment.
-      // effectiveResumeSessionId stays undefined → fresh session path below.
+      // Don't deregister 鈥?we're going to use this new environment.
+      // effectiveResumeSessionId stays undefined 鈫?fresh session path below.
     } else {
       // Force-stop any stale worker instances for this session and re-queue
       // it so our poll loop picks it up. Must happen after registration so
@@ -2521,22 +2499,21 @@ export async function bridgeMain(args: string[]): Promise<void> {
       if (!reconnected) {
         const err = lastReconnectErr
 
-        // Do NOT deregister on transient reconnect failure — at this point
+        // Do NOT deregister on transient reconnect failure 鈥?at this point
         // environmentId IS the session's own environment. Deregistering
         // would make retry impossible. The backend's 4h TTL cleans up.
         const isFatal = err instanceof BridgeFatalError
         // Clear pointer only on fatal reconnect failure. Transient failures
         // ("try running the same command again") should keep the pointer so
-        // next launch re-prompts — that IS the retry mechanism.
+        // next launch re-prompts 鈥?that IS the retry mechanism.
         if (resumePointerDir && isFatal) {
           const { clearBridgePointer } = await import('./bridgePointer.js')
           await clearBridgePointer(resumePointerDir)
         }
-        // biome-ignore lint/suspicious/noConsole: intentional error output
         console.error(
           isFatal
             ? `Error: ${errorMessage(err)}`
-            : `Error: Failed to reconnect session ${resumeSessionId}: ${errorMessage(err)}\nThe session may still be resumable — try running the same command again.`,
+            : `Error: Failed to reconnect session ${resumeSessionId}: ${errorMessage(err)}\nThe session may still be resumable 鈥?try running the same command again.`,
         )
         // eslint-disable-next-line custom-rules/no-process-exit
         process.exit(1)
@@ -2610,7 +2587,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Listen for keys: space toggles QR code, w toggles spawn mode
   const onStdinData = (data: Buffer): void => {
     if (data[0] === 0x03 || data[0] === 0x04) {
-      // Ctrl+C / Ctrl+D — trigger graceful shutdown
+      // Ctrl+C / Ctrl+D 鈥?trigger graceful shutdown
       process.emit('SIGINT')
       return
     }
@@ -2662,7 +2639,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   // Auto-create an empty session so the user has somewhere to type
   // immediately (matching /remote-control behavior). Controlled by
   // preCreateSession: on by default; --no-create-session-in-dir opts out.
-  // When a --session-id resume succeeded, skip creation entirely — the
+  // When a --session-id resume succeeded, skip creation entirely 鈥?the
   // session already exists and bridge/reconnect has re-queued it.
   // When resume was requested but failed on env mismatch, effectiveResumeSessionId
   // is undefined, so we fall through to fresh session creation (honoring the
@@ -2767,7 +2744,7 @@ export async function bridgeMain(args: string[]): Promise<void> {
   process.exit(0)
 }
 
-// ─── Headless bridge (daemon worker) ────────────────────────────────────────
+// 鈹€鈹€鈹€ Headless bridge (daemon worker) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
 /**
  * Thrown by runBridgeHeadless for configuration issues the supervisor should
@@ -2802,7 +2779,7 @@ export type HeadlessBridgeOpts = {
  * Linear subset of bridgeMain(): no readline dialogs, no stdin key handlers,
  * no TUI, no process.exit(). Config comes from the caller (daemon.json), auth
  * comes via IPC (supervisor's AuthManager), logs go to the worker's stdout
- * pipe. Throws on fatal errors — the worker catches and maps permanent vs
+ * pipe. Throws on fatal errors 鈥?the worker catches and maps permanent vs
  * transient to the right exit code.
  *
  * Resolves cleanly when `signal` aborts and the poll loop tears down.
@@ -2814,8 +2791,8 @@ export async function runBridgeHeadless(
   const { dir, log } = opts
 
   // Worker inherits the supervisor's CWD. chdir first so git utilities
-  // (getBranch/getRemoteUrl) — which read from bootstrap CWD state set
-  // below — resolve against the right repo.
+  // (getBranch/getRemoteUrl) 鈥?which read from bootstrap CWD state set
+  // below 鈥?resolve against the right repo.
   process.chdir(dir)
   const { setOriginalCwd, setCwdState } = await import('../bootstrap/state.js')
   setOriginalCwd(dir)
@@ -2835,7 +2812,7 @@ export async function runBridgeHeadless(
   }
 
   if (!opts.getAccessToken()) {
-    // Transient — supervisor's AuthManager may pick up a token on next cycle.
+    // Transient 鈥?supervisor's AuthManager may pick up a token on next cycle.
     throw new Error(BRIDGE_LOGIN_ERROR)
   }
 
@@ -2909,7 +2886,7 @@ export async function runBridgeHeadless(
     environmentId = reg.environment_id
     environmentSecret = reg.environment_secret
   } catch (err) {
-    // Transient — let supervisor backoff-retry.
+    // Transient 鈥?let supervisor backoff-retry.
     throw new Error(`Bridge registration failed: ${errorMessage(err)}`)
   }
 

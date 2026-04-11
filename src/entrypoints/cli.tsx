@@ -12,7 +12,7 @@ if (typeof globalThis.MACRO === "undefined") {
         VERSION_CHANGELOG: "",
     };
 }
-// Build-time constants — normally replaced by Bun bundler at compile time
+// Build-time constants 鈥?normally replaced by Bun bundler at compile time
 (globalThis as any).BUILD_TARGET = "external";
 (globalThis as any).BUILD_ENV = "production";
 (globalThis as any).INTERFACE_TYPE = "stdio";
@@ -34,7 +34,7 @@ if (process.env.CLAUDE_CODE_REMOTE === "true") {
 
 // Harness-science L0 ablation baseline. Inlined here (not init.ts) because
 // BashTool/AgentTool/PowerShellTool capture DISABLE_BACKGROUND_TASKS into
-// module-level consts at import time — init() runs too late. feature() gate
+// module-level consts at import time 鈥?init() runs too late. feature() gate
 // DCEs this entire block from external builds.
 // eslint-disable-next-line custom-rules/no-top-level-side-effects, custom-rules/no-process-env-top-level
 if (feature("ABLATION_BASELINE") && process.env.CLAUDE_CODE_ABLATION_BASELINE) {
@@ -66,7 +66,6 @@ async function main(): Promise<void> {
         (args[0] === "--version" || args[0] === "-v" || args[0] === "-V")
     ) {
         // MACRO.VERSION is inlined at build time
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.log(`${MACRO.VERSION} (Claude Code)`);
         return;
     }
@@ -88,7 +87,6 @@ async function main(): Promise<void> {
             (modelIdx !== -1 && args[modelIdx + 1]) || getMainLoopModel();
         const { getSystemPrompt } = await import("../constants/prompts.js");
         const prompt = await getSystemPrompt([], model);
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.log(prompt.join("\n"));
         return;
     }
@@ -115,10 +113,9 @@ async function main(): Promise<void> {
         return;
     }
 
-    // Fast-path for `--daemon-worker=<kind>` (internal — supervisor spawns this).
+    // Fast-path for `--daemon-worker=<kind>` (internal 鈥?supervisor spawns this).
     // Must come before the daemon subcommand check: spawned per-worker, so
-    // perf-sensitive. No enableConfigs(), no analytics sinks at this layer —
-    // workers are lean. If a worker kind needs configs/auth (assistant will),
+    // perf-sensitive. No enableConfigs(), no analytics sinks at this layer 鈥?    // workers are lean. If a worker kind needs configs/auth (assistant will),
     // it calls them inside its run() fn.
     if (feature("DAEMON") && args[0] === "--daemon-worker") {
         const { runDaemonWorker } = await import("../daemon/workerRegistry.js");
@@ -147,7 +144,7 @@ async function main(): Promise<void> {
         const { bridgeMain } = await import("../bridge/bridgeMain.js");
         const { exitWithError } = await import("../utils/process.js");
 
-        // Auth check must come before the GrowthBook gate check — without auth,
+        // Auth check must come before the GrowthBook gate check 鈥?without auth,
         // GrowthBook has no user context and would return a stale/default false.
         // getBridgeDisabledReason awaits GB init, so the returned value is fresh
         // (not the stale disk cache), but init still needs auth headers to work.
@@ -233,7 +230,7 @@ async function main(): Promise<void> {
         const { templatesMain } =
             await import("../cli/handlers/templateJobs.js");
         await templatesMain(args);
-        // process.exit (not return) — mountFleetView's Ink TUI can leave event
+        // process.exit (not return) 鈥?mountFleetView's Ink TUI can leave event
         // loop handles that prevent natural exit.
         // eslint-disable-next-line custom-rules/no-process-exit
         process.exit(0);

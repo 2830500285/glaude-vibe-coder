@@ -61,7 +61,6 @@ function handlePluginCommandError(
     : command === 'disable-all'
       ? 'disable all plugins'
       : `${command} plugins`
-  // biome-ignore lint/suspicious/noConsole:: intentional console output
   console.error(
     `${figures.cross} Failed to ${operation}: ${errorMessage(error)}`,
   )
@@ -105,7 +104,6 @@ export async function installPlugin(
   scope: InstallableScope = 'user',
 ): Promise<void> {
   try {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`Installing plugin "${plugin}"...`)
 
     const result = await installPluginOp(plugin, scope)
@@ -113,13 +111,11 @@ export async function installPlugin(
     if (!result.success) {
       throw new Error(result.message)
     }
-
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${figures.tick} ${result.message}`)
 
     // _PROTO_* routes to PII-tagged plugin_name/marketplace_name BQ columns.
     // Unredacted plugin_id was previously logged to general-access
-    // additional_metadata for all users — dropped in favor of the privileged
+    // additional_metadata for all users 鈥?dropped in favor of the privileged
     // column route.
     const { name, marketplace } = parsePluginIdentifier(
       result.pluginId || plugin,
@@ -161,8 +157,6 @@ export async function uninstallPlugin(
     if (!result.success) {
       throw new Error(result.message)
     }
-
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${figures.tick} ${result.message}`)
 
     const { name, marketplace } = parsePluginIdentifier(
@@ -202,8 +196,6 @@ export async function enablePlugin(
     if (!result.success) {
       throw new Error(result.message)
     }
-
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${figures.tick} ${result.message}`)
 
     const { name, marketplace } = parsePluginIdentifier(
@@ -243,8 +235,6 @@ export async function disablePlugin(
     if (!result.success) {
       throw new Error(result.message)
     }
-
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${figures.tick} ${result.message}`)
 
     const { name, marketplace } = parsePluginIdentifier(
@@ -279,8 +269,6 @@ export async function disableAllPlugins(): Promise<void> {
     if (!result.success) {
       throw new Error(result.message)
     }
-
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${figures.tick} ${result.message}`)
 
     logEvent('tengu_plugin_disabled_all_cli', {})
@@ -303,7 +291,7 @@ export async function updatePluginCli(
 ): Promise<void> {
   try {
     writeToStdout(
-      `Checking for updates for plugin "${plugin}" at ${scope} scope…\n`,
+      `Checking for updates for plugin "${plugin}" at ${scope} scope鈥n`,
     )
 
     const result = await updatePluginOp(plugin, scope)

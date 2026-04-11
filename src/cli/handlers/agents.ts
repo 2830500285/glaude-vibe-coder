@@ -1,5 +1,5 @@
 /**
- * Agents subcommand handler — prints the list of configured agents.
+ * Agents subcommand handler 鈥?prints the list of configured agents.
  * Dynamically imported only when `claude agents` runs.
  */
 
@@ -26,7 +26,7 @@ function formatAgent(agent: ResolvedAgent): string {
   if (agent.memory) {
     parts.push(`${agent.memory} memory`)
   }
-  return parts.join(' · ')
+  return parts.join(' 路 ')
 }
 
 export async function agentsHandler(): Promise<void> {
@@ -59,12 +59,9 @@ export async function agentsHandler(): Promise<void> {
   }
 
   if (lines.length === 0) {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log('No agents found.')
   } else {
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(`${totalActive} active agents\n`)
-    // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.log(lines.join('\n').trimEnd())
   }
 }

@@ -36,14 +36,13 @@ export function writeToStderr(data: string): void {
 // Write error to stderr and exit with code 1. Consolidates the
 // console.error + process.exit(1) pattern used in entrypoint fast-paths.
 export function exitWithError(message: string): never {
-  // biome-ignore lint/suspicious/noConsole:: intentional console output
   console.error(message)
   // eslint-disable-next-line custom-rules/no-process-exit
   process.exit(1)
 }
 
 // Wait for a stdin-like stream to close, but give up after ms if no data ever
-// arrives. First data chunk cancels the timeout — after that, wait for end
+// arrives. First data chunk cancels the timeout 鈥?after that, wait for end
 // unconditionally (caller's accumulator needs all chunks, not just the first).
 // Returns true on timeout, false on end. Used by -p mode to distinguish a
 // real pipe producer from an inherited-but-idle parent stdin.

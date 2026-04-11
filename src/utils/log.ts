@@ -158,7 +158,6 @@ const isHardFailMode = memoize((): boolean => {
 export function logError(error: unknown): void {
   const err = toError(error)
   if (feature('HARD_FAIL') && isHardFailMode()) {
-    // biome-ignore lint/suspicious/noConsole:: intentional crash output
     console.error('[HARD FAIL] logError called with:', err.stack || err.message)
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(1)
@@ -269,7 +268,7 @@ async function loadLogList(path: string): Promise<LogOption[]> {
           : parseISOString(date),
         firstPrompt:
           firstPrompt.split('\n')[0]?.slice(0, 50) +
-            (firstPrompt.length > 50 ? '…' : '') || 'No prompt',
+            (firstPrompt.length > 50 ? '鈥? : '') || 'No prompt',
         messageCount: messages.length,
         isSidechain,
       }
@@ -332,7 +331,7 @@ export function captureAPIRequest(
   params: BetaMessageStreamParams,
   querySource?: QuerySource,
 ): void {
-  // startsWith, not exact match — users with non-default output styles get
+  // startsWith, not exact match 鈥?users with non-default output styles get
   // variants like 'repl_main_thread:outputStyle:Explanatory' (querySource.ts).
   if (!querySource || !querySource.startsWith('repl_main_thread')) {
     return

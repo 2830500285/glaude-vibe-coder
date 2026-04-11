@@ -49,7 +49,6 @@ export async function getImageProcessor(): Promise<SharpFunction> {
       return sharpFn
     } catch {
       // Fall back to sharp if native module is not available
-      // biome-ignore lint/suspicious/noConsole: intentional warning
       console.warn(
         'Native image processor not available, falling back to sharp',
       )
@@ -84,7 +83,7 @@ export async function getImageCreator(): Promise<SharpCreator> {
   return sharp
 }
 
-// Dynamic import shape varies by module interop mode — ESM yields { default: fn }, CJS yields fn directly.
+// Dynamic import shape varies by module interop mode 鈥?ESM yields { default: fn }, CJS yields fn directly.
 type MaybeDefault<T> = T | { default: T }
 
 function unwrapDefault<T extends (...args: never[]) => unknown>(

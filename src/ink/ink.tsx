@@ -128,8 +128,7 @@ export default class Ink {
   // scanElementSubtree, when the target message is mounted), stores them
   // message-relative, sets this for every-frame apply. rowOffset =
   // message's current screen-top. currentIdx = which position is
-  // "current" (yellow). null clears. Positions are known upfront —
-  // navigation is index arithmetic, no scan-feedback loop.
+  // "current" (yellow). null clears. Positions are known upfront 鈥?  // navigation is index arithmetic, no scan-feedback loop.
   private searchPositions: {
     positions: MatchPosition[];
     rowOffset: number;
@@ -140,7 +139,7 @@ export default class Ink {
   // so UI (e.g. footer hints) can react to selection appearing/clearing.
   private readonly selectionListeners = new Set<() => void>();
   // DOM nodes currently under the pointer (mode-1003 motion). Held here
-  // so App.tsx's handleMouseEvent is stateless — dispatchHover diffs
+  // so App.tsx's handleMouseEvent is stateless 鈥?dispatchHover diffs
   // against this set and mutates it in place.
   private readonly hoveredNodes = new Set<dom.DOMElement>();
   // Set by <AlternateScreen> via setAltScreenActive(). Controls the
@@ -152,8 +151,8 @@ export default class Ink {
   // re-enable mouse tracking (not all <AlternateScreen> uses want it).
   private altScreenMouseTracking = false;
   // True when the previous frame's screen buffer cannot be trusted for
-  // blit — selection overlay mutated it, resetFramesForAltScreen()
-  // replaced it with blanks, or forceRedraw() reset it to 0×0. Forces
+  // blit 鈥?selection overlay mutated it, resetFramesForAltScreen()
+  // replaced it with blanks, or forceRedraw() reset it to 0脳0. Forces
   // one full-render frame; steady-state frames after clear it and regain
   // the blit + narrow-damage fast path.
   private prevFrameContaminated = false;
@@ -166,13 +165,13 @@ export default class Ink {
   // Native cursor positioning: a component (via useDeclaredCursor) declares
   // where the terminal cursor should be parked after each frame. Terminal
   // emulators render IME preedit text at the physical cursor position, and
-  // screen readers / screen magnifiers track it — so parking at the text
+  // screen readers / screen magnifiers track it 鈥?so parking at the text
   // input's caret makes CJK input appear inline and lets a11y tools follow.
   private cursorDeclaration: CursorDeclaration | null = null;
   // Main-screen: physical cursor position after the declared-cursor move,
   // tracked separately from frame.cursor (which must stay at content-bottom
   // for log-update's relative-move invariants). Alt-screen doesn't need
-  // this — every frame begins with CSI H. null = no move emitted last frame.
+  // this 鈥?every frame begins with CSI H. null = no move emitted last frame.
   private displayCursor: {
     x: number;
     y: number;
@@ -202,8 +201,8 @@ export default class Ink {
 
     // scheduleRender is called from the reconciler's resetAfterCommit, which
     // runs BEFORE React's layout phase (ref attach + useLayoutEffect). Any
-    // state set in layout effects — notably the cursorDeclaration from
-    // useDeclaredCursor — would lag one commit behind if we rendered
+    // state set in layout effects 鈥?notably the cursorDeclaration from
+    // useDeclaredCursor 鈥?would lag one commit behind if we rendered
     // synchronously. Deferring to a microtask runs onRender after layout
     // effects have committed, so the native cursor tracks the caret without
     // a one-keystroke lag. Same event-loop tick, so throughput is unchanged.
@@ -299,10 +298,10 @@ export default class Ink {
   };
 
   // NOT debounced. A debounce opens a window where stdout.columns is NEW
-  // but this.terminalColumns/Yoga are OLD — any scheduleRender during that
+  // but this.terminalColumns/Yoga are OLD 鈥?any scheduleRender during that
   // window (spinner, clock) makes log-update detect a width change and
   // clear the screen, then the debounce fires and clears again (double
-  // blank→paint flicker). useVirtualScroll's height scaling already bounds
+  // blank鈫抪aint flicker). useVirtualScroll's height scaling already bounds
   // the per-resize cost; synchronous handling keeps dimensions consistent.
   private handleResize = () => {
     const cols = this.options.stdout.columns || 80;
@@ -316,11 +315,11 @@ export default class Ink {
     this.altScreenParkPatch = makeAltScreenParkPatch(this.terminalRows);
 
     // Alt screen: reset frame buffers so the next render repaints from
-    // scratch (prevFrameContaminated → every cell written, wrapped in
-    // BSU/ESU — old content stays visible until the new frame swaps
+    // scratch (prevFrameContaminated 鈫?every cell written, wrapped in
+    // BSU/ESU 鈥?old content stays visible until the new frame swaps
     // atomically). Re-assert mouse tracking (some emulators reset it on
     // resize). Do NOT write ENTER_ALT_SCREEN: iTerm2 treats ?1049h as a
-    // buffer clear even when already in alt — that's the blank flicker.
+    // buffer clear even when already in alt 鈥?that's the blank flicker.
     // Self-healing re-entry (if something kicked us out of alt) is handled
     // by handleResume (SIGCONT) and the sleep-wake detector; resize itself
     // doesn't exit alt-screen. Do NOT write ERASE_SCREEN: render() below
@@ -356,7 +355,7 @@ export default class Ink {
     this.pause();
     this.suspendStdin();
     this.options.stdout.write(
-    // Disable extended key reporting first — editors that don't speak
+    // Disable extended key reporting first 鈥?editors that don't speak
     // CSI-u (e.g. nano) show "Unknown sequence" for every Ctrl-<key> if
     // kitty/modifyOtherKeys stays active. exitAlternateScreen re-enables.
     DISABLE_KITTY_KEYBOARD + DISABLE_MODIFY_OTHER_KEYS + (this.altScreenMouseTracking ? DISABLE_MOUSE_TRACKING : '') + (
@@ -384,12 +383,12 @@ export default class Ink {
    * smcup/rmcup (?1049h/?1049l), so even though we started in alt,
    * the editor's rmcup on exit drops us to main screen. Without
    * re-entering, the 2J below wipes the user's main-screen scrollback
-   * and subsequent renders land in main — native terminal scroll
+   * and subsequent renders land in main 鈥?native terminal scroll
    * returns, fullscreen scroll is dead.
    */
   exitAlternateScreen(): void {
     this.options.stdout.write((this.altScreenActive ? ENTER_ALT_SCREEN : '') +
-    // re-enter alt — vim's rmcup dropped us to main
+    // re-enter alt 鈥?vim's rmcup dropped us to main
     '\x1b[2J' +
     // clear screen (now alt if fullscreen)
     '\x1b[H' + (
@@ -407,7 +406,7 @@ export default class Ink {
       this.repaint();
     }
     this.resume();
-    // Re-enable focus reporting and extended key reporting — terminal
+    // Re-enable focus reporting and extended key reporting 鈥?terminal
     // editors (vim, nano, etc.) write their own modifyOtherKeys level on
     // entry and reset it on exit, leaving us unable to distinguish
     // ctrl+shift+<letter> from ctrl+<letter>. Pop-before-push keeps the
@@ -419,7 +418,7 @@ export default class Ink {
     if (this.isUnmounted || this.isPaused) {
       return;
     }
-    // Entering a render cancels any pending drain tick — this render will
+    // Entering a render cancels any pending drain tick 鈥?this render will
     // handle the drain (and re-schedule below if needed). Prevents a
     // wheel-event-triggered render AND a drain-timer render both firing.
     if (this.drainTimer !== null) {
@@ -448,19 +447,19 @@ export default class Ink {
 
     // Sticky/auto-follow scrolled the ScrollBox this frame. Translate the
     // selection by the same delta so the highlight stays anchored to the
-    // TEXT (native terminal behavior — the selection walks up the screen
+    // TEXT (native terminal behavior 鈥?the selection walks up the screen
     // as content scrolls, eventually clipping at the top). frontFrame
     // still holds the PREVIOUS frame's screen (swap is at ~500 below), so
     // captureScrolledRows reads the rows that are about to scroll out
-    // before they're overwritten — the text stays copyable until the
+    // before they're overwritten 鈥?the text stays copyable until the
     // selection scrolls entirely off. During drag, focus tracks the mouse
-    // (screen-local) so only anchor shifts — selection grows toward the
+    // (screen-local) so only anchor shifts 鈥?selection grows toward the
     // mouse as the anchor walks up. After release, both ends are text-
     // anchored and move as a block.
     const follow = consumeFollowScroll();
     if (follow && this.selection.anchor &&
     // Only translate if the selection is ON scrollbox content. Selections
-    // in the footer/prompt/StickyPromptHeader are on static text — the
+    // in the footer/prompt/StickyPromptHeader are on static text 鈥?the
     // scroll doesn't move what's under them. Without this guard, a
     // footer selection would be shifted by -delta then clamped to
     // viewportBottom, teleporting it into the scrollbox. Mirror the
@@ -475,7 +474,7 @@ export default class Ink {
       // to scroll off, shift moves the selection endpoint so the same rows
       // won't intersect again next frame. Capturing without shifting leaves
       // the endpoint in place, so the SAME viewport rows re-intersect every
-      // frame and scrolledOffAbove grows without bound — getSelectedText
+      // frame and scrolledOffAbove grows without bound 鈥?getSelectedText
       // then returns ever-growing text on each re-copy. Keep capture inside
       // each shift branch so the pairing can't be broken by a new guard.
       if (this.selection.isDragging) {
@@ -487,13 +486,13 @@ export default class Ink {
       // Flag-3 guard: the anchor check above only proves ONE endpoint is
       // on scrollbox content. A drag from row 3 (scrollbox) into the
       // footer at row 6, then release, leaves focus outside the viewport
-      // — shiftSelectionForFollow would clamp it to viewportBottom,
+      // 鈥?shiftSelectionForFollow would clamp it to viewportBottom,
       // teleporting the highlight from static footer into the scrollbox.
       // Symmetric check: require BOTH ends inside to translate. A
       // straddling selection falls through to NEITHER shift NOR capture:
       // the footer endpoint pins the selection, text scrolls away under
       // the highlight, and getSelectedText reads the CURRENT screen
-      // contents — no accumulation. Dragging branch doesn't need this:
+      // contents 鈥?no accumulation. Dragging branch doesn't need this:
       // shiftAnchor ignores focus, and the anchor DOES shift (so capture
       // is correct there even when focus is in the footer).
       !this.selection.focus || this.selection.focus.row >= viewportTop && this.selection.focus.row <= viewportBottom) {
@@ -504,7 +503,7 @@ export default class Ink {
         // Auto-clear (both ends overshot minRow) must notify React-land
         // so useHasSelection re-renders and the footer copy/escape hint
         // disappears. notifySelectionChange() would recurse into onRender;
-        // fire the listeners directly — they schedule a React update for
+        // fire the listeners directly 鈥?they schedule a React update for
         // LATER, they don't re-enter this frame.
         if (cleared) for (const cb of this.selectionListeners) cb();
       }
@@ -516,10 +515,10 @@ export default class Ink {
     //
     // Full-screen damage (PR #20120) is a correctness backstop for the
     // sibling-resize bleed: when flexbox siblings resize between frames
-    // (spinner appears → bottom grows → scrollbox shrinks), the
+    // (spinner appears 鈫?bottom grows 鈫?scrollbox shrinks), the
     // cached-clear + clip-and-cull + setCellAt damage union can miss
     // transition cells at the boundary. But that only happens when layout
-    // actually SHIFTS — didLayoutShift() tracks exactly this (any node's
+    // actually SHIFTS 鈥?didLayoutShift() tracks exactly this (any node's
     // cached yoga position/size differs from current, or a child was
     // removed). Steady-state frames (spinner rotate, clock tick, text
     // stream into fixed-height box) don't shift layout, so normal damage
@@ -540,7 +539,7 @@ export default class Ink {
       // Position-highlight (below) overlays CURRENT (yellow) on top.
       hlActive = applySearchHighlight(frame.screen, this.searchHighlightQuery, this.stylePool);
       // Position-based CURRENT: write yellow at positions[currentIdx] +
-      // rowOffset. No scanning — positions came from a prior scan when
+      // rowOffset. No scanning 鈥?positions came from a prior scan when
       // the message first mounted. Message-relative + rowOffset = screen.
       if (this.searchPositions) {
         const sp = this.searchPositions;
@@ -570,9 +569,9 @@ export default class Ink {
     // content creeps up 1 row/frame. CSI H resets the physical cursor;
     // passing prev.cursor=(0,0) makes the diff compute from the same spot.
     // Self-healing against any external cursor manipulation. Main-screen
-    // can't do this — cursor.y tracks scrollback rows CSI H can't reach.
+    // can't do this 鈥?cursor.y tracks scrollback rows CSI H can't reach.
     // The CSI H write is deferred until after the diff is computed so we
-    // can skip it for empty diffs (no writes → physical cursor unused).
+    // can skip it for empty diffs (no writes 鈫?physical cursor unused).
     let prevFrame = this.frontFrame;
     if (this.altScreenActive) {
       prevFrame = {
@@ -582,7 +581,7 @@ export default class Ink {
     }
     const tDiff = performance.now();
     const diff = this.log.render(prevFrame, frame, this.altScreenActive,
-    // DECSTBM needs BSU/ESU atomicity — without it the outer terminal
+    // DECSTBM needs BSU/ESU atomicity 鈥?without it the outer terminal
     // renders the scrolled-but-not-yet-repainted intermediate state.
     // tmux is the main case (re-emits DECSTBM with its own timing and
     // doesn't implement DEC 2026, so SYNC_OUTPUT_SUPPORTED is false).
@@ -609,7 +608,7 @@ export default class Ink {
         });
         if (isDebugRepaintsEnabled() && patch.debug) {
           const chain = dom.findOwnerChainAtRow(this.rootNode, patch.debug.triggerY);
-          logForDebugging(`[REPAINT] full reset · ${patch.reason} · row ${patch.debug.triggerY}\n` + `  prev: "${patch.debug.prevLine}"\n` + `  next: "${patch.debug.nextLine}"\n` + `  culprit: ${chain.length ? chain.join(' < ') : '(no owner chain captured)'}`, {
+          logForDebugging(`[REPAINT] full reset 路 ${patch.reason} 路 row ${patch.debug.triggerY}\n` + `  prev: "${patch.debug.prevLine}"\n` + `  next: "${patch.debug.nextLine}"\n` + `  culprit: ${chain.length ? chain.join(' < ') : '(no owner chain captured)'}`, {
             level: 'warn'
           });
         }
@@ -624,7 +623,7 @@ export default class Ink {
       // log-update's relative moves compute from a known spot (self-healing
       // against out-of-band cursor drift, see the ALT_SCREEN_ANCHOR_CURSOR
       // comment above). Append CSI row;1 H to park the cursor at the bottom
-      // row (where the prompt input is) — without this, the cursor ends
+      // row (where the prompt input is) 鈥?without this, the cursor ends
       // wherever the last diff write landed (a different row every frame),
       // making iTerm2's cursor guide flicker as it chases the cursor.
       // BSU/ESU protects content atomicity but iTerm2's guide tracks cursor
@@ -633,7 +632,7 @@ export default class Ink {
       //
       // After resize, prepend ERASE_SCREEN too. The diff only writes cells
       // that changed; cells where new=blank and prev-buffer=blank get skipped
-      // — but the physical terminal still has stale content there (shorter
+      // 鈥?but the physical terminal still has stale content there (shorter
       // lines at new width leave old-width text tails visible). ERASE inside
       // BSU/ESU is atomic: old content stays visible until the whole
       // erase+paint lands, then swaps in one go. Writing ERASE_SCREEN
@@ -652,7 +651,7 @@ export default class Ink {
     // position so IME preedit text renders inline and screen readers /
     // magnifiers can follow the input. nodeCache holds the absolute screen
     // rect populated by renderNodeToOutput this frame (including scrollTop
-    // translation) — if the declared node didn't render (stale declaration
+    // translation) 鈥?if the declared node didn't render (stale declaration
     // after remount, or scrolled out of view), it won't be in the cache
     // and no move is emitted.
     const decl = this.cursorDeclaration;
@@ -711,7 +710,7 @@ export default class Ink {
         this.displayCursor = target;
       } else {
         // Declaration cleared (input blur, unmount). Restore physical cursor
-        // to frame.cursor before forgetting the park position — otherwise
+        // to frame.cursor before forgetting the park position 鈥?otherwise
         // displayCursor=null lies about where the cursor is, and the NEXT
         // frame's preamble (or log-update's relative moves) computes from a
         // wrong spot. The preamble above handles hasDiff; this handles
@@ -737,17 +736,17 @@ export default class Ink {
     // Update blit safety for the NEXT frame. The frame just rendered
     // becomes frontFrame (= next frame's prevScreen). If we applied the
     // selection overlay, that buffer has inverted cells. selActive/hlActive
-    // are only ever true in alt-screen; in main-screen this is false→false.
+    // are only ever true in alt-screen; in main-screen this is false鈫抐alse.
     this.prevFrameContaminated = selActive || hlActive;
 
-    // A ScrollBox has pendingScrollDelta left to drain — schedule the next
+    // A ScrollBox has pendingScrollDelta left to drain 鈥?schedule the next
     // frame. MUST NOT call this.scheduleRender() here: we're inside a
     // trailing-edge throttle invocation, timerId is undefined, and lodash's
     // debounce sees timeSinceLastCall >= wait (last call was at the start
-    // of this window) → leadingEdge fires IMMEDIATELY → double render ~0.1ms
-    // apart → jank. Use a plain timeout. If a wheel event arrives first,
+    // of this window) 鈫?leadingEdge fires IMMEDIATELY 鈫?double render ~0.1ms
+    // apart 鈫?jank. Use a plain timeout. If a wheel event arrives first,
     // its scheduleRender path fires a render which clears this timer at
-    // the top of onRender — no double.
+    // the top of onRender 鈥?no double.
     //
     // Drain frames are cheap (DECSTBM + ~10 patches, ~200 bytes) so run at
     // quarter interval (~250fps, setTimeout practical floor) for max scroll
@@ -814,7 +813,7 @@ export default class Ink {
   /**
    * Clear the physical terminal and force a full redraw.
    *
-   * The traditional readline ctrl+l — clears the visible screen and
+   * The traditional readline ctrl+l 鈥?clears the visible screen and
    * redraws the current content. Also the recovery path when the terminal
    * was cleared externally (macOS Cmd+K) and Ink's diff engine thinks
    * unchanged cells don't need repainting. Scrollback is preserved.
@@ -826,7 +825,7 @@ export default class Ink {
       this.resetFramesForAltScreen();
     } else {
       this.repaint();
-      // repaint() resets frontFrame to 0×0. Without this flag the next
+      // repaint() resets frontFrame to 0脳0. Without this flag the next
       // frame's blit optimization copies from that empty screen and the
       // diff sees no content. onRender resets the flag at frame end.
       this.prevFrameContaminated = true;
@@ -838,7 +837,7 @@ export default class Ink {
    * Mark the previous frame as untrustworthy for blit, forcing the next
    * render to do a full-damage diff instead of the per-node fast path.
    *
-   * Lighter than forceRedraw() — no screen clear, no extra write. Call
+   * Lighter than forceRedraw() 鈥?no screen clear, no extra write. Call
    * from a useLayoutEffect cleanup when unmounting a tall overlay: the
    * blit fast path can copy stale cells from the overlay frame into rows
    * the shrunken layout no longer reaches, leaving a ghost title/divider.
@@ -871,20 +870,20 @@ export default class Ink {
 
   /**
    * Re-assert terminal modes after a gap (>5s stdin silence or event-loop
-   * stall). Catches tmux detach→attach, ssh reconnect, and laptop
-   * sleep/wake — none of which send SIGCONT. The terminal may reset DEC
+   * stall). Catches tmux detach鈫抋ttach, ssh reconnect, and laptop
+   * sleep/wake 鈥?none of which send SIGCONT. The terminal may reset DEC
    * private modes on reconnect; this method restores them.
    *
    * Always re-asserts extended key reporting and mouse tracking. Mouse
    * tracking is idempotent (DEC private mode set-when-set is a no-op). The
-   * Kitty keyboard protocol is NOT — CSI >1u is a stack push, so we pop
+   * Kitty keyboard protocol is NOT 鈥?CSI >1u is a stack push, so we pop
    * first to keep depth balanced (pop on empty stack is a no-op per spec,
-   * so after a terminal reset this still restores depth 0→1). Without the
+   * so after a terminal reset this still restores depth 0鈫?). Without the
    * pop, each >5s idle gap adds a stack entry, and the single pop on exit
-   * or suspend can't drain them — the shell is left in CSI u mode where
+   * or suspend can't drain them 鈥?the shell is left in CSI u mode where
    * Ctrl+C/Ctrl+D leak as escape sequences. The alt-screen
-   * re-entry (ERASE_SCREEN + frame reset) is NOT idempotent — it blanks the
-   * screen — so it's opt-in via includeAltScreen. The stdin-gap caller fires
+   * re-entry (ERASE_SCREEN + frame reset) is NOT idempotent 鈥?it blanks the
+   * screen 鈥?so it's opt-in via includeAltScreen. The stdin-gap caller fires
    * on ordinary >5s idle + keypress and must not erase; the event-loop stall
    * detector fires on genuine sleep/wake and opts in. tmux attach / ssh
    * reconnect typically send a resize, which already covers alt-screen via
@@ -892,11 +891,11 @@ export default class Ink {
    */
   reassertTerminalModes = (includeAltScreen = false): void => {
     if (!this.options.stdout.isTTY) return;
-    // Don't touch the terminal during an editor handoff — re-enabling kitty
+    // Don't touch the terminal during an editor handoff 鈥?re-enabling kitty
     // keyboard here would undo enterAlternateScreen's disable and nano would
     // start seeing CSI-u sequences again.
     if (this.isPaused) return;
-    // Extended keys — re-assert if enabled (App.tsx enables these on
+    // Extended keys 鈥?re-assert if enabled (App.tsx enables these on
     // allowlisted terminals at raw-mode entry; a terminal reset clears them).
     // Pop-before-push keeps Kitty stack depth at 1 instead of accumulating
     // on each call.
@@ -904,11 +903,11 @@ export default class Ink {
       this.options.stdout.write(DISABLE_KITTY_KEYBOARD + ENABLE_KITTY_KEYBOARD + ENABLE_MODIFY_OTHER_KEYS);
     }
     if (!this.altScreenActive) return;
-    // Mouse tracking — idempotent, safe to re-assert on every stdin gap.
+    // Mouse tracking 鈥?idempotent, safe to re-assert on every stdin gap.
     if (this.altScreenMouseTracking) {
       this.options.stdout.write(ENABLE_MOUSE_TRACKING);
     }
-    // Alt-screen re-entry — destructive (ERASE_SCREEN). Only for callers that
+    // Alt-screen re-entry 鈥?destructive (ERASE_SCREEN). Only for callers that
     // have a strong signal the terminal actually dropped mode 1049.
     if (includeAltScreen) {
       this.reenterAltScreen();
@@ -921,10 +920,10 @@ export default class Ink {
    * EXIT_ALT_SCREEN but before the remaining terminal-reset sequences.
    * Without this, signal-exit's deferred ink.unmount() (triggered by
    * process.exit()) runs the full unmount path: onRender() + writeSync
-   * cleanup block + updateContainerSync → AlternateScreen unmount cleanup.
+   * cleanup block + updateContainerSync 鈫?AlternateScreen unmount cleanup.
    * The result is 2-3 redundant EXIT_ALT_SCREEN sequences landing on the
    * main screen AFTER printResumeHint(), which tmux (at least) interprets
-   * as restoring the saved cursor position — clobbering the resume hint.
+   * as restoring the saved cursor position 鈥?clobbering the resume hint.
    */
   detachForShutdown(): void {
     this.isUnmounted = true;
@@ -932,9 +931,9 @@ export default class Ink {
     // cleanupTerminalModes() and process.exit() and write to main screen.
     this.scheduleRender.cancel?.();
     // Restore stdin from raw mode. unmount() used to do this via React
-    // unmount (App.componentWillUnmount → handleSetRawMode(false)) but we're
-    // short-circuiting that path. Must use this.options.stdin — NOT
-    // process.stdin — because getStdinOverride() may have opened /dev/tty
+    // unmount (App.componentWillUnmount 鈫?handleSetRawMode(false)) but we're
+    // short-circuiting that path. Must use this.options.stdin 鈥?NOT
+    // process.stdin 鈥?because getStdinOverride() may have opened /dev/tty
     // when stdin is piped.
     const stdin = this.options.stdin as NodeJS.ReadStream & {
       isRaw?: boolean;
@@ -954,7 +953,7 @@ export default class Ink {
   /**
    * Re-enter alt-screen, clear, home, re-enable mouse tracking, and reset
    * frame buffers so the next render repaints from scratch. Self-heal for
-   * SIGCONT, resize, and stdin-gap/event-loop-stall (sleep/wake) — any of
+   * SIGCONT, resize, and stdin-gap/event-loop-stall (sleep/wake) 鈥?any of
    * which can leave the terminal in main-screen mode while altScreenActive
    * stays true. ENTER_ALT_SCREEN is a terminal-side no-op if already in alt.
    */
@@ -964,15 +963,15 @@ export default class Ink {
   }
 
   /**
-   * Seed prev/back frames with full-size BLANK screens (rows×cols of empty
-   * cells, not 0×0). In alt-screen mode, next.screen.height is always
+   * Seed prev/back frames with full-size BLANK screens (rows脳cols of empty
+   * cells, not 0脳0). In alt-screen mode, next.screen.height is always
    * terminalRows; if prev.screen.height is 0 (emptyFrame's default),
    * log-update sees heightDelta > 0 ('growing') and calls renderFrameSlice,
    * whose trailing per-row CR+LF at the last row scrolls the alt screen,
    * permanently desyncing the virtual and physical cursors by 1 row.
    *
-   * With a rows×cols blank prev, heightDelta === 0 → standard diffEach
-   * → moveCursorTo (CSI cursorMove, no LF, no scroll).
+   * With a rows脳cols blank prev, heightDelta === 0 鈫?standard diffEach
+   * 鈫?moveCursorTo (CSI cursorMove, no LF, no scroll).
    *
    * viewport.height = rows + 1 matches the renderer's alt-screen output,
    * preventing a spurious resize trigger on the first frame. cursor.y = 0
@@ -1000,7 +999,7 @@ export default class Ink {
     // resets), but a stale displayCursor would be misleading if we later
     // exit to main-screen without an intervening render.
     this.displayCursor = null;
-    // Fresh frontFrame is blank rows×cols — blitting from it would copy
+    // Fresh frontFrame is blank rows脳cols 鈥?blitting from it would copy
     // blanks over content. Next alt-screen frame must full-render.
     this.prevFrameContaminated = true;
   }
@@ -1015,7 +1014,7 @@ export default class Ink {
     const text = getSelectedText(this.selection, this.frontFrame.screen);
     if (text) {
       // Raw OSC 52, or DCS-passthrough-wrapped OSC 52 inside tmux (tmux
-      // drops it silently unless allow-passthrough is on — no regression).
+      // drops it silently unless allow-passthrough is on 鈥?no regression).
       void setClipboard(text).then(raw => {
         if (raw) this.options.stdout.write(raw);
       });
@@ -1043,10 +1042,10 @@ export default class Ink {
   }
 
   /**
-   * Set the search highlight query. Non-empty → all visible occurrences
+   * Set the search highlight query. Non-empty 鈫?all visible occurrences
    * are inverted (SGR 7) on the next frame; first one also underlined.
-   * Empty → clears (prevFrameContaminated handles the frame after). Same
-   * damage-tracking machinery as selection — setCellStyleId doesn't track
+   * Empty 鈫?clears (prevFrameContaminated handles the frame after). Same
+   * damage-tracking machinery as selection 鈥?setCellStyleId doesn't track
    * damage, so the overlay forces full-frame damage while active.
    */
   setSearchHighlight(query: string): void {
@@ -1059,19 +1058,19 @@ export default class Ink {
    *  height, scan for query. Returns positions relative to the element's
    *  bounding box (row 0 = element top).
    *
-   *  The element comes from the MAIN tree — built with all real
+   *  The element comes from the MAIN tree 鈥?built with all real
    *  providers, yoga already computed. We paint it to a fresh buffer
    *  with offsets so it lands at (0,0). Same paint path as the main
    *  render. Zero drift. No second React root, no context bridge.
    *
-   *  ~1-2ms (paint only, no reconcile — the DOM is already built). */
+   *  ~1-2ms (paint only, no reconcile 鈥?the DOM is already built). */
   scanElementSubtree(el: dom.DOMElement): MatchPosition[] {
     if (!this.searchHighlightQuery || !el.yogaNode) return [];
     const width = Math.ceil(el.yogaNode.getComputedWidth());
     const height = Math.ceil(el.yogaNode.getComputedHeight());
     if (width <= 0 || height <= 0) return [];
     // renderNodeToOutput adds el's OWN computedLeft/Top to offsetX/Y.
-    // Passing -elLeft/-elTop nets to 0 → paints at (0,0) in our buffer.
+    // Passing -elLeft/-elTop nets to 0 鈫?paints at (0,0) in our buffer.
     const elLeft = el.yogaNode.getComputedLeft();
     const elTop = el.yogaNode.getComputedTop();
     const screen = createScreen(width, height, this.stylePool, this.charPool, this.hyperlinkPool);
@@ -1087,19 +1086,18 @@ export default class Ink {
       prevScreen: undefined
     });
     const rendered = output.get();
-    // renderNodeToOutput wrote our offset positions to nodeCache —
-    // corrupts the main render (it'd blit from wrong coords). Mark the
+    // renderNodeToOutput wrote our offset positions to nodeCache 鈥?    // corrupts the main render (it'd blit from wrong coords). Mark the
     // subtree dirty so the next main render repaints + re-caches
     // correctly. One extra paint of this message, but correct > fast.
     dom.markDirty(el);
     const positions = scanPositions(rendered, this.searchHighlightQuery);
-    logForDebugging(`scanElementSubtree: q='${this.searchHighlightQuery}' ` + `el=${width}x${height}@(${elLeft},${elTop}) n=${positions.length} ` + `[${positions.slice(0, 10).map(p => `${p.row}:${p.col}`).join(',')}` + `${positions.length > 10 ? ',…' : ''}]`);
+    logForDebugging(`scanElementSubtree: q='${this.searchHighlightQuery}' ` + `el=${width}x${height}@(${elLeft},${elTop}) n=${positions.length} ` + `[${positions.slice(0, 10).map(p => `${p.row}:${p.col}`).join(',')}` + `${positions.length > 10 ? ',鈥? : ''}]`);
     return positions;
   }
 
   /** Set the position-based highlight state. Every frame, writes CURRENT
    *  style at positions[currentIdx] + rowOffset. null clears. The scan-
-   *  highlight (inverse on all matches) still runs — this overlays yellow
+   *  highlight (inverse on all matches) still runs 鈥?this overlays yellow
    *  on top. rowOffset changes as the user scrolls (= message's current
    *  screen-top); positions stay stable (message-relative). */
   setSearchPositions(state: {
@@ -1115,7 +1113,7 @@ export default class Ink {
    * Set the selection highlight background color. Replaces the per-cell
    * SGR-7 inverse with a solid theme-aware bg (matches native terminal
    * selection). Accepts the same color formats as Text backgroundColor
-   * (rgb(), ansi:name, #hex, ansi256()) — colorize() routes through
+   * (rgb(), ansi:name, #hex, ansi256()) 鈥?colorize() routes through
    * chalk so the tmux/xterm.js level clamps in colorize.ts apply and
    * the emitted SGR is correct for the current terminal.
    *
@@ -1127,8 +1125,7 @@ export default class Ink {
    */
   setSelectionBgColor(color: string): void {
     // Wrap a NUL marker, then split on it to extract the open/close SGR.
-    // colorize returns the input unchanged if the color string is bad —
-    // no NUL-split then, so fall through to null (inverse fallback).
+    // colorize returns the input unchanged if the color string is bad 鈥?    // no NUL-split then, so fall through to null (inverse fallback).
     const wrapped = colorize('\0', color, 'background');
     const nul = wrapped.indexOf('\0');
     if (nul <= 0 || nul === wrapped.length - 1) {
@@ -1159,7 +1156,7 @@ export default class Ink {
    * Shift anchor AND focus by dRow, clamped to [minRow, maxRow]. Used by
    * keyboard scroll handlers (PgUp/PgDn etc.) so the highlight tracks the
    * content instead of disappearing. Unlike shiftAnchor (drag-to-scroll),
-   * this moves BOTH endpoints — the user isn't holding the mouse at one
+   * this moves BOTH endpoints 鈥?the user isn't holding the mouse at one
    * edge. Supplies screen.width for the col-reset-on-clamp boundary.
    */
   shiftSelectionForScroll(dRow: number, minRow: number, maxRow: number): void {
@@ -1167,8 +1164,7 @@ export default class Ink {
     shiftSelection(this.selection, dRow, minRow, maxRow, this.frontFrame.screen.width);
     // shiftSelection clears when both endpoints overshoot the same edge
     // (Home/g/End/G page-jump past the selection). Notify subscribers so
-    // useHasSelection updates. Safe to call notifySelectionChange here —
-    // this runs from keyboard handlers, not inside onRender().
+    // useHasSelection updates. Safe to call notifySelectionChange here 鈥?    // this runs from keyboard handlers, not inside onRender().
     if (hadSel && !hasSelection(this.selection)) {
       this.notifySelectionChange();
     }
@@ -1177,7 +1173,7 @@ export default class Ink {
   /**
    * Keyboard selection extension (shift+arrow/home/end). Moves focus;
    * anchor stays fixed so the highlight grows or shrinks relative to it.
-   * Left/right wrap across row boundaries — native macOS text-edit
+   * Left/right wrap across row boundaries 鈥?native macOS text-edit
    * behavior: shift+left at col 0 wraps to end of the previous row.
    * Up/down clamp at viewport edges (no scroll-to-extend yet). Drops to
    * char mode. No-op outside alt-screen or without an active selection.
@@ -1251,7 +1247,7 @@ export default class Ink {
    * Hit-test the rendered DOM tree at (col, row) and bubble a ClickEvent
    * from the deepest hit node up through ancestors with onClick handlers.
    * Returns true if a DOM handler consumed the click. Gated on
-   * altScreenActive — clicks only make sense with a fixed viewport where
+   * altScreenActive 鈥?clicks only make sense with a fixed viewport where
    * nodeCache rects map 1:1 to terminal cells (no scrollback offset).
    */
   dispatchClick(col: number, row: number): boolean {
@@ -1268,7 +1264,7 @@ export default class Ink {
     const event = new KeyboardEvent(parsedKey);
     dispatcher.dispatchDiscrete(target, event);
 
-    // Tab cycling is the default action — only fires if no handler
+    // Tab cycling is the default action 鈥?only fires if no handler
     // called preventDefault(). Mirrors browser behavior.
     if (!event.defaultPrevented && parsedKey.name === 'tab' && !parsedKey.ctrl && !parsedKey.meta) {
       if (parsedKey.shift) {
@@ -1283,7 +1279,7 @@ export default class Ink {
    * an OSC 8 hyperlink first, then falls back to scanning the row for a
    * plain-text URL (mouse tracking intercepts the terminal's native
    * Cmd+Click URL detection, so we replicate it). This is a pure lookup
-   * with no side effects — call it synchronously at click time so the
+   * with no side effects 鈥?call it synchronously at click time so the
    * result reflects the screen the user actually clicked on, then defer
    * the browser-open action via a timer.
    */
@@ -1309,7 +1305,7 @@ export default class Ink {
   /**
    * Stable prototype wrapper for onHyperlinkClick. Passed to <App> as
    * onOpenHyperlink so the prop is a bound method (autoBind'd) that reads
-   * the mutable field at call time — not the undefined-at-render value.
+   * the mutable field at call time 鈥?not the undefined-at-render value.
    */
   openHyperlink(url: string): void {
     this.onHyperlinkClick?.(url);
@@ -1425,8 +1421,8 @@ export default class Ink {
 
   // Stable identity for TerminalWriteContext. An inline arrow here would
   // change on every render() call (initial mount + each resize), which
-  // cascades through useContext → <AlternateScreen>'s useLayoutEffect dep
-  // array → spurious exit+re-enter of the alt screen on every SIGWINCH.
+  // cascades through useContext 鈫?<AlternateScreen>'s useLayoutEffect dep
+  // array 鈫?spurious exit+re-enter of the alt screen on every SIGWINCH.
   private writeRaw(data: string): void {
     this.options.stdout.write(data);
   }
@@ -1478,7 +1474,7 @@ export default class Ink {
         // Exit alt screen FIRST so other cleanup sequences go to the main screen.
         writeSync(1, EXIT_ALT_SCREEN);
       }
-      // Disable mouse tracking — unconditional because altScreenActive can be
+      // Disable mouse tracking 鈥?unconditional because altScreenActive can be
       // stale if AlternateScreen's unmount (which flips the flag) raced a
       // blocked event loop + SIGINT. No-op if tracking was never enabled.
       writeSync(1, DISABLE_MOUSE_TRACKING);
@@ -1547,7 +1543,7 @@ export default class Ink {
    * Replace char/hyperlink pools with fresh instances to prevent unbounded
    * growth during long sessions. Migrates the front frame's screen IDs into
    * the new pools so diffing remains correct. The back frame doesn't need
-   * migration — resetScreen zeros it before any reads.
+   * migration 鈥?resetScreen zeros it before any reads.
    *
    * Call between conversation turns or periodically.
    */
@@ -1562,7 +1558,6 @@ export default class Ink {
     this.backFrame.screen.hyperlinkPool = this.hyperlinkPool;
   }
   patchConsole(): () => void {
-    // biome-ignore lint/suspicious/noConsole: intentionally patching global console
     const con = console;
     const originals: Partial<Record<keyof Console, Console[keyof Console]>> = {};
     const toDebug = (...args: unknown[]) => logForDebugging(`console.log: ${format(...args)}`);
@@ -1585,14 +1580,14 @@ export default class Ink {
   /**
    * Intercept process.stderr.write so stray writes (config.ts, hooks.ts,
    * third-party deps) don't corrupt the alt-screen buffer. patchConsole only
-   * hooks console.* methods — direct stderr writes bypass it, land at the
+   * hooks console.* methods 鈥?direct stderr writes bypass it, land at the
    * parked cursor, scroll the alt-screen, and desync frontFrame from the
    * physical terminal. Next diff writes only changed-in-React cells at
-   * absolute coords → interleaved garbage.
+   * absolute coords 鈫?interleaved garbage.
    *
    * Swallows the write (routes text to the debug log) and, in alt-screen,
    * forces a full-damage repaint as a defensive recovery. Not patching
-   * process.stdout — Ink itself writes there.
+   * process.stdout 鈥?Ink itself writes there.
    */
   private patchStderr(): () => void {
     const stderr = process.stderr;
@@ -1600,7 +1595,7 @@ export default class Ink {
     let reentered = false;
     const intercept = (chunk: Uint8Array | string, encodingOrCb?: BufferEncoding | ((err?: Error) => void), cb?: (err?: Error) => void): boolean => {
       const callback = typeof encodingOrCb === 'function' ? encodingOrCb : cb;
-      // Reentrancy guard: logForDebugging → writeToStderr → here. Pass
+      // Reentrancy guard: logForDebugging 鈫?writeToStderr 鈫?here. Pass
       // through to the original so --debug-to-stderr still works and we
       // don't stack-overflow.
       if (reentered) {
@@ -1638,7 +1633,7 @@ export default class Ink {
  *
  * Two layers of trickiness:
  *
- * 1. setRawMode is termios, not fcntl — the stdin fd stays blocking, so
+ * 1. setRawMode is termios, not fcntl 鈥?the stdin fd stays blocking, so
  *    readSync on it would hang forever. Node doesn't expose fcntl, so we
  *    open /dev/tty fresh with O_NONBLOCK (all fds to the controlling
  *    terminal share one line-discipline input queue).
@@ -1657,7 +1652,7 @@ export default class Ink {
 export function drainStdin(stdin: NodeJS.ReadStream = process.stdin): void {
   if (!stdin.isTTY) return;
   // Drain Node's stream buffer (bytes libuv already pulled in). read()
-  // returns null when empty — never blocks.
+  // returns null when empty 鈥?never blocks.
   try {
     while (stdin.read() !== null) {
       /* discard */
@@ -1677,12 +1672,12 @@ export function drainStdin(stdin: NodeJS.ReadStream = process.stdin): void {
   };
   const wasRaw = tty.isRaw === true;
   // Drain the kernel TTY buffer via a fresh O_NONBLOCK fd. Bounded at 64
-  // reads (64KB) — a real mouse burst is a few hundred bytes; the cap
+  // reads (64KB) 鈥?a real mouse burst is a few hundred bytes; the cap
   // guards against a terminal that ignores O_NONBLOCK.
   let fd = -1;
   try {
     // setRawMode inside try: on revoked TTY (SIGHUP/SSH disconnect) the
-    // ioctl throws EBADF — same recovery path as openSync/readSync below.
+    // ioctl throws EBADF 鈥?same recovery path as openSync/readSync below.
     if (!wasRaw) tty.setRawMode?.(true);
     fd = openSync('/dev/tty', fsConstants.O_RDONLY | fsConstants.O_NONBLOCK);
     const buf = Buffer.alloc(1024);
@@ -1690,8 +1685,8 @@ export function drainStdin(stdin: NodeJS.ReadStream = process.stdin): void {
       if (readSync(fd, buf, 0, buf.length, null) <= 0) break;
     }
   } catch {
-    // EAGAIN (buffer empty — expected), ENXIO/ENOENT (no controlling tty),
-    // EBADF/EIO (TTY revoked — SIGHUP, SSH disconnect)
+    // EAGAIN (buffer empty 鈥?expected), ENXIO/ENOENT (no controlling tty),
+    // EBADF/EIO (TTY revoked 鈥?SIGHUP, SSH disconnect)
   } finally {
     if (fd >= 0) {
       try {
