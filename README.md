@@ -1,5 +1,9 @@
 # Glaude Vibe Coder
 
+[![Build](https://github.com/2830500285/glaude-vibe-coder/actions/workflows/ci.yml/badge.svg)](https://github.com/2830500285/glaude-vibe-coder/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/2830500285/glaude-vibe-coder?label=Release)](https://github.com/2830500285/glaude-vibe-coder/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/2830500285/glaude-vibe-coder/releases)
+[![Downloads](https://img.shields.io/github/downloads/2830500285/glaude-vibe-coder/total?label=Downloads)](https://github.com/2830500285/glaude-vibe-coder/releases)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
 [Chinese Version](./README.zh-CN.md)
