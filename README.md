@@ -4,9 +4,9 @@ Glaude Vibe Coder is a terminal-first AI coding assistant project with a Bun-bas
 
 ## Windows Downloads
 
-- [Glaude Vibe Coder-Setup-1.0.2.exe](https://github.com/2830500285/glaude-vibe-coder/releases/download/v1.0.2/Glaude%20Vibe%20Coder-Setup-1.0.2.exe)
+- [Glaude Vibe Coder-Setup-1.0.2.exe](https://github.com/2830500285/glaude-vibe-coder/releases/download/v1.0.2/Glaude.Vibe.Coder-Setup-1.0.2.exe)
   Recommended for most users. This installer adds the application through the normal Windows setup flow.
-- [Glaude Vibe Coder.exe（免安装版，下载 ZIP 后解压运行）](https://github.com/2830500285/glaude-vibe-coder/releases/download/v1.0.2/Glaude%20Vibe%20Coder-win-unpacked-1.0.2.zip)
+- [Glaude Vibe Coder Portable Package](https://github.com/2830500285/glaude-vibe-coder/releases/download/v1.0.2/Glaude.Vibe.Coder-win-unpacked-1.0.2.zip)
   Use this if you want to run the app directly without installation. Download the ZIP, extract the full folder, and then launch `Glaude Vibe Coder.exe` inside it.
 
 ## Download Notes
