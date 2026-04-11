@@ -5,6 +5,7 @@
   "type": "module",
   "main": "electron/main.mjs",
   "author": "Gong Fenglin <gongfenglin@sdust.edu.cn>",
+  "license": "CC-BY-NC-4.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/2830500285/glaude-vibe-coder.git"

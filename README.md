@@ -1,5 +1,7 @@
 # Glaude Vibe Coder
 
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
 [Chinese Version](./README.zh-CN.md)
 
 Glaude Vibe Coder turns the Claude Code style agent workflow into a desktop, project-oriented, locally deployable workspace. Its main advantage is not "a stronger model." The real upgrade is product form: GUI, project organization, local packaging, multi-backend configuration, and a more complete path from development to daily use.
@@ -87,6 +89,12 @@ bun run app
 - `Glaude Vibe Coder-Setup-1.0.2.exe` is the recommended installer build.
 - The portable package is not a single standalone EXE. Keep the extracted `resources/` and related files together with `Glaude Vibe Coder.exe`.
 - This repository excludes bundled dependencies, local app state, logs, and release build directories from version control.
+
+## License
+
+This repository is distributed under the Creative Commons Attribution-NonCommercial 4.0 International license (`CC BY-NC 4.0`).
+
+You may share and adapt the material for non-commercial use with attribution. For the full license text, see [LICENSE](./LICENSE) or visit [creativecommons.org/licenses/by-nc/4.0/](https://creativecommons.org/licenses/by-nc/4.0/).
 
 ## Maintainer
 

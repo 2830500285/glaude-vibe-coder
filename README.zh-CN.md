@@ -1,5 +1,7 @@
 # Glaude Vibe Coder
 
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
 [English Version](./README.md)
 
 Glaude Vibe Coder 把 Claude Code 风格的智能体工作流，做成了一个桌面化、项目化、可本地部署的工作台。它的核心亮点并不在于“模型更强”，而在于产品形态和落地方式更完整: 有 GUI、有桌面应用、有项目组织方式、有本地安装分发能力，也支持多后端模型配置。
@@ -87,6 +89,12 @@ bun run app
 - `Glaude Vibe Coder-Setup-1.0.2.exe` 是推荐使用的安装版。
 - 免安装包不是单独一个可执行文件，必须在解压后的完整目录里运行 `Glaude Vibe Coder.exe`。
 - 当前公开仓库不会提交依赖目录、本地状态、日志和发布产物目录。
+
+## 许可证
+
+本仓库按 Creative Commons Attribution-NonCommercial 4.0 International（`CC BY-NC 4.0`）发布。
+
+你可以在非商业前提下进行共享和改编，但需要保留署名。完整授权条款见 [LICENSE](./LICENSE)，官方说明见 [creativecommons.org/licenses/by-nc/4.0/](https://creativecommons.org/licenses/by-nc/4.0/)。
 
 ## 维护者
 
