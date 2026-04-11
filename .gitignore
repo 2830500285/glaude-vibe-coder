@@ -1,0 +1,17 @@
+node_modules
+.DS_Store
+dist
+release
+release-icon
+desktop-builder
+build
+coverage
+.env
+*.log
+app-server*.log
+.idea
+.vscode
+*.suo
+*.lock
+/.claude-app/
+/.glaude-vibe-coding/
