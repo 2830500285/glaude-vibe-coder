@@ -13,5 +13,6 @@ app-server*.log
 .vscode
 *.suo
 *.lock
+!bun.lock
 /.claude-app/
 /.glaude-vibe-coding/
