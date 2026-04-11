@@ -39,6 +39,18 @@ If Claude Code is a powerful terminal coding agent, Glaude Vibe Coder is closer 
 - Multi-provider model switching instead of a single fixed backend path.
 - Installable and shareable packaging for real-world handoff and distribution.
 
+## Free API Options
+
+This project supports custom model backends. If you want free or low-cost APIs for testing, the following options are practical starting points. Availability, quotas, and verification rules can change over time, so confirm the current policy before production use.
+
+| Provider / Resource | Address | Notes |
+| --- | --- | --- |
+| SiliconFlow | Signup: [cloud.siliconflow.cn/i/96exzPgC](https://cloud.siliconflow.cn/i/96exzPgC)<br>Console: [cloud.siliconflow.cn](https://cloud.siliconflow.cn/)<br>Docs: [docs.siliconflow.cn](https://docs.siliconflow.cn/)<br>API Base URL: `https://api.siliconflow.cn/v1` | Recommended first for mainland China users. OpenAI-compatible and easy to plug into custom provider settings. For domestic services, registration is required and identity verification may be required under current platform rules. New accounts often receive trial or free quota. |
+| free-llm-api-resources | [github.com/cheahjs/free-llm-api-resources](https://github.com/cheahjs/free-llm-api-resources) | One of the most complete and frequently updated resource lists. It categorizes free providers and trial-credit providers, and includes request and token limits. |
+| awesome-free-llm-apis | [github.com/mnfst/awesome-free-llm-apis](https://github.com/mnfst/awesome-free-llm-apis) | A curated awesome-list focused on permanent free tiers and API-key-based access. Useful when you want OpenAI-compatible options without starting from scratch. |
+| GitHub Models | Marketplace: [github.com/marketplace/models](https://github.com/marketplace/models)<br>Docs: [docs.github.com/en/github-models](https://docs.github.com/en/github-models) | Official GitHub offering. You can experiment with models using GitHub credentials, and API access can be used with a PAT that has `models:read`. GitHub documents the free API usage as public preview, so limits and availability may change. |
+| Free-LLM-API | [github.com/daviddwlee84/Free-LLM-API](https://github.com/daviddwlee84/Free-LLM-API) | A smaller collection that is still useful because it includes example integrations for providers such as Hugging Face Inference Providers, OpenRouter, and Together AI. |
+
 ## Feature Overview
 
 - Bun-based CLI and runtime source under `src/`

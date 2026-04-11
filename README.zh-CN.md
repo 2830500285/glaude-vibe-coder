@@ -39,6 +39,18 @@ Glaude Vibe Coder 把 Claude Code 风格的智能体工作流，做成了一个�
 - 多模型、多后端切换能力，而不是单一固定链路。
 - 可安装、可分发、可复用的产品封装能力。
 
+## 免费 API 推荐
+
+本项目支持自定义模型后端。如果你想找一些免费或低成本的 API 来测试，这几项比较适合作为起点。额度、限流、实名和计费政策都可能变化，正式接入前建议再次确认平台当前规则。
+
+| 提供商 / 资源 | 具体地址 | 说明 |
+| --- | --- | --- |
+| 硅基流动 SiliconFlow | 注册链接: [cloud.siliconflow.cn/i/96exzPgC](https://cloud.siliconflow.cn/i/96exzPgC)<br>控制台: [cloud.siliconflow.cn](https://cloud.siliconflow.cn/)<br>文档: [docs.siliconflow.cn](https://docs.siliconflow.cn/)<br>API Base URL: `https://api.siliconflow.cn/v1` | 放在第一推荐位。兼容 OpenAI 接口，适合直接接入本项目的自定义提供商配置。国内服务通常需要先注册，且可能需要完成实名认证；注册后一般会有免费额度或试用额度，具体以平台当前政策为准。 |
+| free-llm-api-resources | [github.com/cheahjs/free-llm-api-resources](https://github.com/cheahjs/free-llm-api-resources) | 目前很全面、更新也比较快的免费大模型 API 资源汇总，区分了完全免费和试用额度两类，还整理了请求频率和 Token 限制。 |
+| awesome-free-llm-apis | [github.com/mnfst/awesome-free-llm-apis](https://github.com/mnfst/awesome-free-llm-apis) | 一个偏精选风格的 Awesome 列表，重点是永久免费或长期免费层，适合找兼容 OpenAI SDK 的可用接口。 |
+| GitHub Models | Marketplace: [github.com/marketplace/models](https://github.com/marketplace/models)<br>文档: [docs.github.com/en/github-models](https://docs.github.com/en/github-models) | GitHub 官方提供的模型体验和推理入口。可以直接用 GitHub 凭据做实验，API 调用可配合带 `models:read` 权限的 PAT 使用。官方说明里免费 API 仍处于 public preview，额度和可用模型可能调整。 |
+| Free-LLM-API | [github.com/daviddwlee84/Free-LLM-API](https://github.com/daviddwlee84/Free-LLM-API) | 相对小众一些，但提供了 Hugging Face Inference Providers、OpenRouter、Together AI 等接入示例，适合想直接看代码的人。 |
+
 ## 功能概览
 
 - `src/` 中包含 CLI、智能体、工具和运行时核心逻辑
