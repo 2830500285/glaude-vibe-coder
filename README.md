@@ -10,6 +10,12 @@
 
 Glaude Vibe Coder turns the Claude Code style agent workflow into a desktop, project-oriented, locally deployable workspace. Its main advantage is not "a stronger model." The real upgrade is product form: GUI, project organization, local packaging, multi-backend configuration, and a more complete path from development to daily use.
 
+## Project Overview
+
+Most coding-agent products still assume a terminal-first workflow: powerful for developers, but less friendly for long-running projects, multi-model switching, file attachments, local directory operations, and visible runtime feedback. Glaude Vibe Coder is built to close that gap. It keeps the useful runtime capabilities of the original CLI style agent, then rebuilds the experience around a visual local workspace that better matches how real projects are managed.
+
+The application organizes work as `Workspace -> Threads -> Chat`. A workspace maps to a concrete local project directory, threads preserve long-lived task context, and each chat can run with its own model profile and execution settings. On top of plain conversation, the system supports local file uploads, file-system operations, command execution, Python execution, context compression, automations, plugins, skills, and MCP integration. The result is a product that behaves less like a one-shot assistant and more like a local collaborative agent system that can stay attached to real work over time.
+
 ## Product Positioning
 
 If Claude Code is a powerful terminal coding agent, Glaude Vibe Coder is closer to a locally deployable Agent IDE / Agent Workspace built for real projects, long-running threads, and team-facing distribution.
