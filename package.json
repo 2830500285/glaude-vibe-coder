@@ -1,7 +1,7 @@
 {
   "name": "glaude-vibe-coder",
   "version": "1.0.2",
-  "description": "Terminal-first AI coding assistant with CLI and desktop runtime components.",
+  "description": "A visual local AI agent workspace with multi-model support, file tools, command execution, Python integration, and desktop packaging.",
   "type": "module",
   "main": "electron/main.mjs",
   "author": "Gong Fenglin <gongfenglin@sdust.edu.cn>",
